@@ -1,4 +1,4 @@
-# Portable version of digiKam
+# Portable version of digiKam (Windows version)
 
 digiKam version: 7.1.0
 
