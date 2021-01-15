@@ -1,7 +1,8 @@
 # Portable version of digiKam
 
 digiKam version: 7.1.0
-Official webpage: https://www.digikam.org/about/overview/
+
+Product webpage: https://www.digikam.org/about/overview/
 
 # What is digiKam?
 digiKam is an advanced open-source digital photo management application that runs on Linux, Windows, and MacOS. The application provides a comprehensive set of tools for importing, managing, editing, and sharing photos and raw files.
