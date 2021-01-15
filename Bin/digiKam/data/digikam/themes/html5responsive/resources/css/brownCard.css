@@ -1,0 +1,271 @@
+@import url("fundament.css");
+
+html {
+	background-color: #8e6d38;
+	border-style: solid;
+	border-width: 1.96em 1.99em 1.99em 5em;
+	border-image: url("../images/BrownCard/brownCardAlbum.jpg") stretch 63 64 64 161;
+}
+
+h1, h2, h3, h4 {
+	font-family: serif;
+}
+
+body {
+	margin: 0;
+	background-image: url("../images/BrownCard/brownCard.png");
+	background-color: transparent;
+	font-family: cursive;
+	color: #494337;
+}
+
+a {
+	color: #393427;
+	text-decoration: none;
+}
+
+a:visited {
+	color: #554e42;
+}
+
+header {
+	display: flex;
+	justify-content: center;
+}
+
+body.collectionListPage h1, div#pageTitleAndPagination, body.collectionListPage ul.collectionList figcaption, body.collectionListPage footer div.copyright {
+	max-width: calc(100% - 2em);
+	display: inline-block;
+	margin: 1em;
+	border-style: solid;
+	border-width: 0.5em;
+	border-image: url("../images/BrownCard/roughPhotoCard.png") round 20 20 20 20;
+	border-image-outset: 0.5em;
+	padding: 0;
+	background-color: #ecece4;
+	text-align: center;
+	filter: drop-shadow(1px 1px 1px #3a2603);
+}
+
+body.collectionListPage h1, body.collectionListPage ul.collectionList figcaption, body.collectionListPage footer div.copyright {
+	margin: 0.5em;
+	border-width: 0.25em;
+	border-image-outset: 0.25em;
+}
+
+body.collectionListPage ul.collectionList figure {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+div#pageTitleAndPagination h1 {
+	margin-top: 0;
+	margin-bottom: 0.2em;
+	text-decoration: underline;
+}
+
+ul.collectionList, ol.imageList {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-evenly;
+	align-items: flex-start;
+}
+
+ul.collectionList li, ol.imageList li {
+	display: flex;
+	margin: 0;
+	justify-content: space-around;
+	align-items: center;
+}
+
+ul.collectionList li a, ol.imageList li a {
+	display: inline-block;
+	margin: 0;
+	background: transparent;
+	padding: 0;
+}
+
+li.landscape a.thumbnailLink, li.square a.thumbnailLink, li.portrait a.thumbnailLink {
+	border-style: solid;
+	border-width: 2.08em 2em 2.04em 2.22em;
+	border-image: url("../images/BrownCard/photoCorners.png") stretch 49 47 48 52;
+	max-width: calc(100% - 4.22em);
+	height: auto;
+}
+
+li a.thumbnailLink img, li a.thumbnailLink img {
+	display: block;
+	filter: sepia(100%);
+	max-width: 100%;
+	height: auto;
+}
+
+li.mod3val2 a img, li.mod5val3 a img {
+	filter: sepia(50%);
+}
+
+li.mod5val4 a img {
+	filter: sepia(0%);
+	filter: grayscale(100%);
+}
+
+ol.imageList figcaption {
+	display: none;
+}
+
+body.imagePage figure#image {
+	margin: 1em auto;
+	text-align: center;
+}
+
+body.imagePage figure#image a {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	max-width: 100%;
+	border-style: solid;
+	border-width: 1em 1em 1em 1em;
+	border-image: url("../images/BrownCard/roughPhotoCard.png") round 20 20 20 20;
+	filter: drop-shadow(3px 3px 1px #3a2603);
+}
+
+body.imagePage figure#image a img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+figure#image figcaption {
+	width: 40em;
+	max-width: calc(100% - 4em);
+	margin: 2em auto;
+	border-style: solid;
+	border-width: 1em 1em 1em 1em;
+	border-image: url("../images/BrownCard/roughPhotoCard.png") round 20 20 20 20;
+	border-image-outset: 1em;
+	background-color: #ecece4;
+	filter: drop-shadow(3px 3px 1px #3a2603);
+}
+
+div.pagination p.previousLink, div.pagination p.nextLink, nav p.upLink {
+	margin: 0.5em;
+	border: 1px solid #393427;
+	padding: 0.2em;
+}
+
+div.pagination p.previousLink, div.pagination p.nextLink {
+	margin-top: 0;
+}
+
+footer {
+	display: flex;
+	justify-content: center;
+}
+
+footer div.paginationAndCopyright {
+	max-width: calc(100% - 2em);
+	display: inline-block;
+	margin: 1em;
+	border-style: solid;
+	border-width: 0.5em;
+	border-image: url("../images/BrownCard/roughPhotoCard.png") round 20 20 20 20;
+	border-image-outset: 0.5em;
+	padding: 0;
+	background-color: #ecece4;
+	text-align: center;
+	filter: drop-shadow(1px 1px 1px #3a2603);
+}
+
+div.pagination {
+	margin: 0.2em 0;
+}
+
+div.pagination p {
+	display: inline-block;
+	margin-top: 0.1em;
+	margin-bottom: 0.1em;
+}
+
+div.pagination p.currentOfTotal {
+	margin-left: 2em;
+	margin-right: 2em;
+}
+
+div.pagination ol {
+	display: inline-block;
+	margin: 0.2em;
+}
+
+div.pagination ol li {
+	display: inline-block;
+}
+
+nav li.pageNumber {
+	min-width: 2em;
+}
+
+nav li.pageNumber.current {
+	text-decoration: underline;
+	font-weight: bold;
+}
+
+body.imagePage p.imageDescription {
+	text-decoration: underline;
+	font-weight: bold;
+}
+
+body.imagePage table.exifData {
+	margin: 1em auto;
+	border-top: 1px solid #554e42;
+	border-bottom: 1px solid #554e42;
+	border-spacing: 0;
+}
+
+body.imagePage table.exifData th, body.imagePage table.exifData td {
+	border-top: 1px solid #554e42;
+}
+
+body.imagePage table.exifData th[scope="row"] {
+	padding-right: 0.5em;
+	text-align: left;
+}
+
+body.imagePage table.exifData td {
+	padding-left: 0.5em;
+	text-align: right;
+}
+
+body.imagePage table.exifData caption {
+	display: none;
+}
+
+@media screen {
+	/* Caption and table header are not really needed for screen display,
+	 as they're mostly intended to add context for speech browsers. */
+	body.imagePage table.exifData caption {
+		display: none;
+	}
+
+	body.imagePage table.exifData th[scope=col] {
+		display: none;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	html {
+		border-image-source: none;
+		border-width: 0;
+	}
+	ul.collectionList li figure, ol.imageList li figure {
+		/*
+		 * Only Firefox currently supports the gap property for flex layout, so
+		 * when the window is narrow the figure margin width takes up too much
+		 * space at the left and right edges. So zero the margin when the width
+		 * is so narrow that we expect a column images. If the gap property is
+		 * supported in future then replace figure margins with gap.
+		 */
+		margin: 0;
+	}
+}

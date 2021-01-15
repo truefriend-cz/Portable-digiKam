@@ -1,0 +1,79 @@
+body {
+	background-color: #333;
+}
+
+nav p {
+	display: inline-block;
+}
+
+nav .pageNumber {
+	padding: 0.3em;
+	list-style-type: none;
+}
+
+nav li.pageNumber.disabled {
+	opacity: 0.75;
+}
+
+nav p.upLink a::before {
+	content: '↑ ';
+}
+nav p.upLink a::after {
+	content: ' ↑';
+}
+
+nav p.previousLink::before {
+	content: '← ';
+}
+
+nav p.nextLink::after {
+	content: ' →';
+}
+
+ol.pageNumbersList, ul.collectionList, ol.imageList {
+	padding: 0;
+}
+
+ul.collectionList li, ol.imageList li {
+	list-style-type: none;
+}
+
+div.pswp__caption__center div.galleryPhotoCaption {
+	display: grid;
+	grid-template-columns: 1fr max-content;
+	grid-template-rows: auto auto;
+	grid-template-areas: "title fullDetLink"
+	"desc desc";
+	grid-column-gap: 1em;
+	grid-row-gap: 0.5em;
+}
+
+div.pswp__caption__center div.galleryPhotoCaption p.galleryPhotoTitle {
+	grid-area: title;
+	margin: 0;
+	font-size: small;
+}
+
+div.pswp__caption__center div.galleryPhotoCaption p.galleryPhotoDescription {
+	grid-area: desc;
+	margin: 0;
+	font-size: smaller;
+}
+
+div.pswp__caption__center div.galleryPhotoCaption p.galleryFullDetailsLink {
+	grid-area: fullDetLink;
+	margin: 0;
+	text-align: right;
+}
+
+div.pswp__caption__center div.galleryPhotoCaption p.galleryFullDetailsLink a {
+	display: inline-block;
+	margin: 0;
+	border: 2px outset white;
+	background-color: blue;
+	padding: 0.1em 0.4em;
+	color: white;
+	font-size: smaller;
+	font-weight: bold;
+	text-decoration: none;
+}

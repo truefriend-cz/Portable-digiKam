@@ -1,0 +1,2625 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * ============================================================
+ *
+ * This file is a part of digiKam project
+ * https://www.digikam.org
+ *
+ * Date        : 2009-07-28
+ * Description : Databases SQL statements
+ *
+ * Copyright (C)      2009 by Holger Foerster <hamsi2k at freenet dot de>
+ * Copyright (C) 2007-2013 by Marcel Wiesweg <marcel dot wiesweg at gmx dot de>
+ * Copyright (C) 2010-2020 by Gilles Caulier <caulier dot gilles at gmail dot com>
+ * Copyright (C)      2018 by Mario Frank    <mario dot frank at uni minus potsdam dot de>
+ *
+ * This program is free software; you can redistribute it
+ * and/or modify it under the terms of the GNU General
+ * Public License as published by the Free Software Foundation;
+ * either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * ============================================================
+ -->
+
+<databaseconfig>
+
+    <defaultDB>QSQLITE</defaultDB>
+
+    <!-- Increment this version number whenever you change this file.
+         The DBCORECONFIG_XML_VERSION value is defined in the toplevel CMakeLists.txt file.
+         On version mismatch, users will be warned.
+    -->
+    <version>3</version>
+
+    <!-- =============================================================================================================== -->
+    <!-- ========================================== SQLITE DATABASE STATEMENTS ========================================= -->
+    <!-- =============================================================================================================== -->
+
+
+    <database name="QSQLITE">
+
+        <hostName>TestHost</hostName>
+        <databaseName>DatabaseName</databaseName>
+        <userName>UserName</userName>
+        <password>Password</password>
+        <port>Port</port>
+        <connectoptions>ConnectOptions</connectoptions>
+
+        <dbactions>
+
+            <!-- SQlite check privileges rules -->
+
+            <dbaction name="CheckPriv_CREATE_TRIGGER">
+                <statement mode="plain">CREATE TRIGGER privcheck_trigger DELETE ON PrivCheck
+                    BEGIN
+                        SELECT * FROM PrivCheck;
+                    END;
+                </statement>
+            </dbaction>
+
+            <dbaction name="CheckPriv_DROP_TRIGGER">
+                <statement mode="plain">
+                    DROP TRIGGER privcheck_trigger;
+                </statement>
+            </dbaction>
+
+            <dbaction name="CheckPriv_CREATE_TABLE">
+                <statement mode="plain">CREATE TABLE PrivCheck
+                    (id   INT,
+                    name VARCHAR(35));
+                </statement>
+            </dbaction>
+
+            <dbaction name="CheckPriv_ALTER_TABLE">
+                <statement mode="plain">
+                    ALTER TABLE PrivCheck ADD COLUMN addedColumn;
+                </statement>
+            </dbaction>
+
+            <dbaction name="CheckPriv_DROP_TABLE">
+                <statement mode="plain">
+                    DROP TABLE PrivCheck;
+                </statement>
+            </dbaction>
+
+            <dbaction name="CheckPriv_Cleanup">
+                <statement mode="plain">
+                    DROP TABLE IF EXISTS PrivCheck;
+                </statement>
+            </dbaction>
+
+            <!-- SQlite Core Schema Database -->
+
+            <dbaction name="CreateDB" mode="transaction">
+                <statement mode="plain">CREATE TABLE AlbumRoots
+                    (id INTEGER PRIMARY KEY,
+                    label TEXT,
+                    status INTEGER NOT NULL,
+                    type INTEGER NOT NULL,
+                    identifier TEXT,
+                    specificPath TEXT,
+                    UNIQUE(identifier, specificPath));
+                </statement>
+                <statement mode="plain">CREATE TABLE Albums
+                    (id INTEGER PRIMARY KEY,
+                    albumRoot INTEGER NOT NULL,
+                    relativePath TEXT NOT NULL,
+                    date DATE,
+                    caption TEXT,
+                    collection TEXT,
+                    icon INTEGER,
+                    UNIQUE(albumRoot, relativePath));
+                </statement>
+                <statement mode="plain">CREATE TABLE Images
+                    (id INTEGER PRIMARY KEY,
+                    album INTEGER,
+                    name TEXT NOT NULL,
+                    status INTEGER NOT NULL,
+                    category INTEGER NOT NULL,
+                    modificationDate DATETIME,
+                    fileSize INTEGER,
+                    uniqueHash TEXT,
+                    manualOrder INTEGER,
+                    UNIQUE (album, name));
+                </statement>
+                <statement mode="plain">CREATE TABLE ImageInformation
+                    (imageid INTEGER PRIMARY KEY,
+                    rating INTEGER,
+                    creationDate DATETIME,
+                    digitizationDate DATETIME,
+                    orientation INTEGER,
+                    width INTEGER,
+                    height INTEGER,
+                    format TEXT,
+                    colorDepth INTEGER,
+                    colorModel INTEGER);
+                </statement>
+                <statement mode="plain">CREATE TABLE ImageMetadata
+                    (imageid INTEGER PRIMARY KEY,
+                    make TEXT,
+                    model TEXT,
+                    lens TEXT,
+                    aperture REAL,
+                    focalLength REAL,
+                    focalLength35 REAL,
+                    exposureTime REAL,
+                    exposureProgram INTEGER,
+                    exposureMode INTEGER,
+                    sensitivity INTEGER,
+                    flash INTEGER,
+                    whiteBalance INTEGER,
+                    whiteBalanceColorTemperature INTEGER,
+                    meteringMode INTEGER,
+                    subjectDistance REAL,
+                    subjectDistanceCategory INTEGER);
+                </statement>
+                <statement mode="plain">CREATE TABLE VideoMetadata
+                    (imageid INTEGER PRIMARY KEY,
+                    aspectRatio TEXT,
+                    audioBitRate TEXT,
+                    audioChannelType TEXT,
+                    audioCompressor TEXT,
+                    duration TEXT,
+                    frameRate TEXT,
+                    exposureProgram INTEGER,
+                    videoCodec TEXT);
+                </statement>
+                <statement mode="plain">CREATE TABLE ImagePositions
+                    (imageid INTEGER PRIMARY KEY,
+                    latitude TEXT,
+                    latitudeNumber REAL,
+                    longitude TEXT,
+                    longitudeNumber REAL,
+                    altitude REAL,
+                    orientation REAL,
+                    tilt REAL,
+                    roll REAL,
+                    accuracy REAL,
+                    description TEXT);
+                </statement>
+                <statement mode="plain">CREATE TABLE ImageComments
+                    (id INTEGER PRIMARY KEY,
+                    imageid INTEGER,
+                    type INTEGER,
+                    language TEXT,
+                    author TEXT,
+                    date DATETIME,
+                    comment TEXT,
+                    UNIQUE(imageid, type, language, author));
+                </statement>
+                <statement mode="plain">CREATE TABLE ImageCopyright
+                    (id INTEGER PRIMARY KEY,
+                    imageid INTEGER,
+                    property TEXT,
+                    value TEXT,
+                    extraValue TEXT,
+                    UNIQUE(imageid, property, value, extraValue));
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Tags
+                    (id INTEGER PRIMARY KEY,
+                    pid INTEGER,
+                    name TEXT NOT NULL,
+                    icon INTEGER,
+                    iconkde TEXT,
+                    UNIQUE (name, pid));
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS TagsTree
+                    (id INTEGER NOT NULL,
+                    pid INTEGER NOT NULL,
+                    UNIQUE (id, pid));
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageTags
+                    (imageid INTEGER NOT NULL,
+                    tagid INTEGER NOT NULL,
+                    UNIQUE (imageid, tagid));
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageProperties
+                    (imageid  INTEGER NOT NULL,
+                    property TEXT NOT NULL,
+                    value    TEXT NOT NULL,
+                    UNIQUE (imageid, property));
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Searches
+                    (id INTEGER PRIMARY KEY,
+                    type INTEGER,
+                    name TEXT NOT NULL,
+                    query TEXT NOT NULL);
+                </statement>
+                <statement mode="plain">CREATE TABLE DownloadHistory
+                    (id  INTEGER PRIMARY KEY,
+                    identifier TEXT,
+                    filename TEXT,
+                    filesize INTEGER,
+                    filedate DATETIME,
+                    UNIQUE(identifier, filename, filesize, filedate));
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Settings
+                    (keyword TEXT NOT NULL UNIQUE,
+                    value TEXT);
+                </statement>
+                <statement mode="plain">CREATE TABLE ImageHistory
+                    (imageid INTEGER PRIMARY KEY,
+                    uuid TEXT,
+                    history TEXT);
+                </statement>
+                <statement mode="plain">CREATE TABLE ImageRelations
+                    (subject INTEGER,
+                    object INTEGER,
+                    type INTEGER,
+                    UNIQUE(subject, object, type));
+                </statement>
+                <statement mode="plain">CREATE TABLE TagProperties
+                    (tagid INTEGER,
+                    property TEXT,
+                    value TEXT);
+                </statement>
+                <statement mode="plain">CREATE TABLE ImageTagProperties
+                    (imageid INTEGER,
+                    tagid INTEGER,
+                    property TEXT,
+                    value TEXT);
+                </statement>
+            </dbaction>
+
+            <!-- SQlite Core Indexes -->
+
+            <dbaction name="CreateIndices" mode="transaction">
+                <statement mode="plain">CREATE INDEX dir_index  ON Images (album);</statement>
+                <statement mode="plain">CREATE INDEX hash_index ON Images (uniqueHash);</statement>
+                <statement mode="plain">CREATE INDEX tag_index  ON ImageTags (tagid);</statement>
+                <statement mode="plain">CREATE INDEX tag_id_index  ON ImageTags (imageid);</statement>
+                <statement mode="plain">CREATE INDEX image_name_index ON Images (name);</statement>
+                <statement mode="plain">CREATE INDEX creationdate_index ON ImageInformation (creationDate);</statement>
+                <statement mode="plain">CREATE INDEX comments_imageid_index ON ImageComments (imageid);</statement>
+                <statement mode="plain">CREATE INDEX copyright_imageid_index ON ImageCopyright (imageid);</statement>
+                <statement mode="plain">CREATE INDEX uuid_index ON ImageHistory (uuid);</statement>
+                <statement mode="plain">CREATE INDEX subject_relations_index ON ImageRelations (subject);</statement>
+                <statement mode="plain">CREATE INDEX object_relations_index ON ImageRelations (object);</statement>
+                <statement mode="plain">CREATE INDEX tagproperties_index ON TagProperties (tagid);</statement>
+                <statement mode="plain">CREATE INDEX imagetagproperties_index ON ImageTagProperties (imageid, tagid);</statement>
+                <statement mode="plain">CREATE INDEX imagetagproperties_imageid_index ON ImageTagProperties (imageid);</statement>
+                <statement mode="plain">CREATE INDEX imagetagproperties_tagid_index ON ImageTagProperties (tagid);</statement>
+            </dbaction>
+
+            <!-- SQlite Core Triggers -->
+
+            <dbaction name="CreateTriggers" mode="transaction">
+                <statement mode="plain">CREATE TRIGGER delete_albumroot DELETE ON AlbumRoots
+                    BEGIN
+                        DELETE FROM Albums
+                        WHERE Albums.albumRoot = OLD.id;
+                    END;
+                </statement>
+                <statement mode="plain">CREATE TRIGGER delete_album DELETE ON Albums
+                BEGIN
+                    DELETE FROM Images
+                    WHERE Images.album = OLD.id;
+                END;
+                </statement>
+                <statement mode="plain">CREATE TRIGGER delete_image DELETE ON Images
+                    BEGIN
+                        DELETE FROM ImageTags          WHERE imageid=OLD.id;
+                        DELETE From ImageInformation   WHERE imageid=OLD.id;
+                        DELETE From ImageMetadata      WHERE imageid=OLD.id;
+                        DELETE From VideoMetadata      WHERE imageid=OLD.id;
+                        DELETE From ImagePositions     WHERE imageid=OLD.id;
+                        DELETE From ImageComments      WHERE imageid=OLD.id;
+                        DELETE From ImageCopyright     WHERE imageid=OLD.id;
+                        DELETE From ImageProperties    WHERE imageid=OLD.id;
+                        DELETE From ImageHistory       WHERE imageid=OLD.id;
+                        DELETE FROM ImageRelations     WHERE subject=OLD.id OR object=OLD.id;
+                        DELETE FROM ImageTagProperties WHERE imageid=OLD.id;
+                        UPDATE Albums SET icon=null    WHERE icon=OLD.id;
+                        UPDATE Tags SET icon=null      WHERE icon=OLD.id;
+                    END;
+                </statement>
+                <statement mode="plain">CREATE TRIGGER delete_tag DELETE ON Tags
+                    BEGIN
+                        DELETE FROM ImageTags WHERE tagid=OLD.id;
+                        DELETE FROM TagProperties WHERE tagid=OLD.id;
+                        DELETE FROM ImageTagProperties WHERE tagid=OLD.id;
+                    END;
+                </statement>
+                <statement mode="plain">CREATE TRIGGER insert_tagstree AFTER INSERT ON Tags
+                    BEGIN
+                    INSERT INTO TagsTree
+                        SELECT NEW.id, NEW.pid
+                        UNION
+                        SELECT NEW.id, pid FROM TagsTree WHERE id=NEW.pid;
+                    END;
+                </statement>
+                <statement mode="plain">CREATE TRIGGER delete_tagstree DELETE ON Tags
+                    BEGIN
+                        DELETE FROM Tags
+                        WHERE id  IN (SELECT id FROM TagsTree WHERE pid=OLD.id);
+                        DELETE FROM TagsTree
+                        WHERE id IN (SELECT id FROM TagsTree WHERE pid=OLD.id);
+                        DELETE FROM TagsTree
+                        WHERE id=OLD.id;
+                    END;
+                </statement>
+                <statement mode="plain">CREATE TRIGGER move_tagstree UPDATE OF pid ON Tags
+                    BEGIN
+                        DELETE FROM TagsTree
+                            WHERE
+                            ((id = OLD.id)
+                            OR
+                            id IN (SELECT id FROM TagsTree WHERE pid=OLD.id))
+                            AND
+                            pid IN (SELECT pid FROM TagsTree WHERE id=OLD.id);
+                        INSERT INTO TagsTree
+                            SELECT NEW.id, NEW.pid
+                            UNION
+                            SELECT NEW.id, pid FROM TagsTree WHERE id=NEW.pid
+                            UNION
+                            SELECT id, NEW.pid FROM TagsTree WHERE pid=NEW.id
+                            UNION
+                            SELECT A.id, B.pid FROM TagsTree A, TagsTree B
+                            WHERE
+                            A.pid = NEW.id AND B.id = NEW.pid;
+                    END;
+                </statement>
+            </dbaction>
+
+            <dbaction name="getItemURLsInAlbumByItemName">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album WHERE Albums.id=:albumID ORDER BY Images.name COLLATE NOCASE;</statement>
+            </dbaction>
+
+            <!-- NOTE: Don't collate on the path - this is to maintain the same behavior
+                       that happens when sort order is "By Path"
+            -->
+            <dbaction name="getItemURLsInAlbumByItemPath">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album WHERE Albums.id=:albumID ORDER BY Albums.relativePath,Images.name;</statement>
+            </dbaction>
+
+            <dbaction name="getItemURLsInAlbumByItemDate">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album INNER JOIN ImageInformation ON ImageInformation.imageid=Images.id WHERE Albums.id=:albumID ORDER BY ImageInformation.creationDate;</statement>
+            </dbaction>
+
+            <dbaction name="getItemURLsInAlbumByItemRating">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album INNER JOIN ImageInformation ON ImageInformation.imageid=Images.id WHERE Albums.id=:albumID ORDER BY ImageInformation.rating DESC;</statement>
+            </dbaction>
+
+            <dbaction name="getItemURLsInAlbumNoItemSorting">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album WHERE Albums.id=:albumID;</statement>
+            </dbaction>
+
+            <dbaction name="changeItemInformation" mode="transaction">
+                 <statement mode="query">INSERT OR IGNORE INTO ImageInformation ( imageid, :fieldList ) VALUES ( :id, :valueList );</statement>
+                 <statement mode="query">UPDATE ImageInformation SET :fieldValueList WHERE imageid=:id;</statement>
+            </dbaction>
+
+            <dbaction name="changeImageHistory" mode="transaction">
+                <statement mode="query">INSERT OR IGNORE INTO ImageHistory ( imageid, :fieldList ) VALUES ( :id, :valueList );</statement>
+                <statement mode="query">UPDATE ImageHistory SET :fieldValueList WHERE imageid=:id;</statement>
+            </dbaction>
+
+            <dbaction name="InsertTag">
+                <statement mode="query">INSERT INTO Tags (pid, name) VALUES( :tagPID, :tagname);</statement>
+            </dbaction>
+
+            <dbaction name="DeleteTag"><statement mode="query">DELETE FROM Tags WHERE id=:tagID;</statement></dbaction>
+
+            <dbaction name="deleteAlbumRoot">
+                <statement mode="query">DELETE FROM Albums WHERE albumRoot=:albumRoot;</statement>
+            </dbaction>
+
+            <dbaction name="deleteAlbumRootPath">
+                <statement mode="query">DELETE FROM Albums WHERE albumRoot=:albumRoot AND relativePath=:relativePath;</statement>
+            </dbaction>
+
+            <dbaction name="deleteAlbumID">
+                <statement mode="query">DELETE FROM Albums WHERE Albums.id=:albumId;</statement>
+            </dbaction>
+
+            <dbaction name="GetItemURLsInTagRecursive">
+                <statement mode="query">SELECT Albums.albumRoot, Albums.relativePath, Images.name
+                    FROM Images JOIN Albums ON Albums.id=Images.album
+                        WHERE Images.status=1 AND Images.id IN (SELECT imageid FROM ImageTags WHERE tagid=:tagID OR tagid IN (SELECT id FROM TagsTree WHERE pid=:tagID2)  );
+                </statement>
+            </dbaction>
+
+            <dbaction name="GetItemURLsInTag">
+                <statement mode="query">SELECT Albums.albumRoot, Albums.relativePath, Images.name
+                    FROM Images JOIN Albums ON Albums.id=Images.album
+                        WHERE Images.status=1 AND Images.id IN (SELECT imageid FROM ImageTags WHERE tagid=:tagID);
+                </statement>
+            </dbaction>
+
+            <dbaction name="getItemIDsInTagRecursive">
+                <statement mode="query">SELECT imageid FROM ImageTags JOIN Images ON ImageTags.imageid=Images.id
+                    WHERE Images.status=1 AND
+                    ( tagid=:tagID
+                    OR tagid IN (SELECT id FROM TagsTree WHERE pid=:tagPID) );
+                </statement>
+            </dbaction>
+
+            <dbaction name="getItemIDsInTag">
+                <statement mode="query">SELECT imageid FROM ImageTags JOIN Images ON ImageTags.imageid=Images.id
+                    WHERE Images.status=1 AND tagid=:tagID;
+                </statement>
+            </dbaction>
+
+            <dbaction name="listTagRecursive">
+                <statement mode="query">SELECT DISTINCT Images.id, Images.name, Images.album,
+                    Albums.albumRoot,
+                    ImageInformation.rating, Images.category,
+                    ImageInformation.format, ImageInformation.creationDate,
+                    Images.modificationDate, Images.fileSize,
+                    ImageInformation.width, ImageInformation.height
+                    FROM Images
+                        INNER JOIN ImageInformation ON Images.id=ImageInformation.imageid
+                        INNER JOIN Albums ON Albums.id=Images.album
+                        WHERE Images.status=1 AND Images.id IN
+                        (SELECT imageid FROM ImageTags
+                        WHERE tagid=:tagID OR tagid IN (SELECT id FROM TagsTree WHERE pid=:tagPID));
+                </statement>
+            </dbaction>
+
+            <dbaction name="listTag">
+                <statement mode="query">SELECT DISTINCT Images.id, Images.name, Images.album,
+                    Albums.albumRoot,
+                    ImageInformation.rating, Images.category,
+                    ImageInformation.format, ImageInformation.creationDate,
+                    Images.modificationDate, Images.fileSize,
+                    ImageInformation.width, ImageInformation.height
+                    FROM Images
+                        INNER JOIN ImageInformation ON Images.id=ImageInformation.imageid
+                        INNER JOIN Albums ON Albums.id=Images.album
+                        WHERE Images.status=1 AND Images.id IN
+                        (SELECT imageid FROM ImageTags
+                        WHERE tagid=:tagID );
+                </statement>
+            </dbaction>
+
+            <!-- SQlite Thumbnails Schema Database -->
+
+            <dbaction name="CreateThumbnailsDB" mode="transaction">
+                <statement mode="plain">CREATE TABLE Thumbnails
+                    (id INTEGER PRIMARY KEY,
+                    type INTEGER,
+                    modificationDate DATETIME,
+                    orientationHint INTEGER,
+                    data BLOB);
+                </statement>
+                <statement mode="plain">CREATE TABLE UniqueHashes
+                    (uniqueHash TEXT,
+                    fileSize INTEGER,
+                    thumbId INTEGER,
+                    UNIQUE(uniqueHash, fileSize));
+                </statement>
+                <statement mode="plain">CREATE TABLE FilePaths
+                    (path TEXT,
+                    thumbId INTEGER,
+                    UNIQUE(path));
+                </statement>
+                <statement mode="plain">CREATE TABLE CustomIdentifiers
+                    (identifier TEXT,
+                    thumbId INTEGER,
+                    UNIQUE(identifier));
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Settings
+                    (keyword TEXT NOT NULL UNIQUE,
+                    value TEXT);
+                </statement>
+            </dbaction>
+
+            <!-- SQlite Thumbnails Indexes -->
+
+            <dbaction name="CreateThumbnailsDBIndices" mode="transaction">
+                <statement mode="plain">CREATE INDEX id_uniqueHashes ON UniqueHashes (thumbId);</statement>
+                <statement mode="plain">CREATE INDEX id_filePaths ON FilePaths (thumbId);</statement>
+                <statement mode="plain">CREATE INDEX id_customIdentifiers ON CustomIdentifiers (thumbId);</statement>
+            </dbaction>
+
+            <!-- SQlite Thumbnails Trigger -->
+
+            <dbaction name="CreateThumbnailsDBTrigger" mode="transaction">
+                <statement mode="plain">CREATE TRIGGER delete_thumbnails DELETE ON Thumbnails
+                    BEGIN
+                        DELETE FROM UniqueHashes WHERE UniqueHashes.thumbId = OLD.id;
+                        DELETE FROM FilePaths WHERE FilePaths.thumbId = OLD.id;
+                        DELETE FROM CustomIdentifiers WHERE CustomIdentifiers.thumbId = OLD.id;
+                    END;
+                </statement>
+            </dbaction>
+
+            <!-- SQlite Thumbnails Queries -->
+
+            <dbaction name="SelectThumbnailSetting">
+                <statement mode="query">SELECT value FROM Settings WHERE keyword=:keyword;</statement>
+            </dbaction>
+
+            <dbaction name="SelectThumbnailLegacySetting">
+                <statement mode="query">SELECT value FROM Settings WHERE keyword=:keyword;</statement>
+            </dbaction>
+
+            <dbaction name="ReplaceThumbnailSetting">
+                <statement mode="query">REPLACE INTO Settings VALUES (:keyword, :value);</statement>
+            </dbaction>
+
+            <!-- SQlite Face Schema Database -->
+
+            <!--
+                The face database file contains the tables listed below:
+                Identities:           contains a list of identities with type.
+                IdentityAttributes:   contains identity attributes as text name and UUID.
+                OpenCVLBPHRecognizer: this table currently will have only one entry, and was used with LPBH recognition algorithm (deprecated).
+                OpenCVLBPHistograms:  contains face histogram data for each identity for the LBPH recognition algorithm that was used when the training was done (deprecated).
+                FaceMatrices:         contains face matrices data for each identity for the DNN recognition algorithm that was used when the training was done.
+                Settings:             includes database version rules.
+            -->
+
+            <dbaction name="CreateFaceDB" mode="transaction">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Settings
+                    (keyword TEXT NOT NULL UNIQUE,
+                    value TEXT);
+                </statement>
+                <statement mode="plain">CREATE TABLE Identities
+                    (id INTEGER PRIMARY KEY,
+                    type INTEGER);
+                </statement>
+                <statement mode="plain">CREATE TABLE IdentityAttributes
+                    (id INTEGER,
+                    attribute TEXT,
+                    value TEXT);
+                </statement>
+            </dbaction>
+
+            <dbaction name="CreateFaceDBOpenCVLBPH" mode="transaction">
+                <statement mode="plain">CREATE TABLE OpenCVLBPHRecognizer
+                    (id INTEGER PRIMARY KEY,
+                    version INTEGER,
+                    radius INTEGER,
+                    neighbors INTEGER,
+                    grid_x INTEGER,
+                    grid_y INTEGER);
+                </statement>
+                <statement mode="plain">CREATE TABLE OpenCVLBPHistograms
+                    (id INTEGER PRIMARY KEY,
+                    recognizerid INTEGER,
+                    identity INTEGER,
+                    context TEXT,
+                    type INTEGER,
+                    rows INTEGER,
+                    cols INTEGER,
+                    data BLOB);
+                </statement>
+            </dbaction>
+
+            <dbaction name="CreateFaceDBFaceMatrices" mode="transaction">
+                <statement mode="plain">CREATE TABLE FaceMatrices
+                    (id INTEGER PRIMARY KEY,
+                    identity INTEGER,
+                    context TEXT,
+                    type INTEGER,
+                    rows INTEGER,
+                    cols INTEGER,
+                    data BLOB,
+                    vecdata BLOB);
+                </statement>
+            </dbaction>
+
+            <!-- SQlite Face Indexes -->
+
+            <dbaction name="CreateFaceIndices" mode="transaction">
+                <statement mode="plain">CREATE INDEX attribute_index  ON IdentityAttributes (id);</statement>
+            </dbaction>
+
+            <!-- SQlite Face Triggers -->
+
+            <dbaction name="CreateFaceTriggers" mode="transaction">
+                <statement mode="plain">
+                    CREATE TRIGGER delete_identities DELETE ON Identities
+                    BEGIN
+                        DELETE FROM IdentityAttributes
+                        WHERE IdentityAttributes.id = OLD.id;
+                    END;
+                </statement>
+            </dbaction>
+
+            <!-- SQlite Face Queries -->
+
+            <dbaction name="SelectFaceSetting">
+                <statement mode="query">SELECT value FROM Settings WHERE keyword=:keyword;</statement>
+            </dbaction>
+
+            <dbaction name="ReplaceFaceSetting">
+                <statement mode="query">REPLACE INTO Settings VALUES (:keyword, :value);</statement>
+            </dbaction>
+
+            <!-- SQlite Similarity Database -->
+
+            <dbaction name="CreateSimilarityDB" mode="transaction">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageSimilarity
+                    (imageid1 INTEGER NOT NULL,
+                    imageid2 INTEGER NOT NULL,
+                    algorithm INTEGER,
+                    value DOUBLE,
+                    CONSTRAINT Similar UNIQUE(imageid1, imageid2, algorithm));
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageHaarMatrix
+                    (imageid INTEGER PRIMARY KEY,
+                    modificationDate DATETIME,
+                    uniqueHash TEXT,
+                    matrix BLOB);
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS SimilaritySettings
+                    (keyword TEXT NOT NULL UNIQUE,
+                    value TEXT);
+                </statement>
+            </dbaction>
+
+            <!-- SQlite Similarity Indexes -->
+
+            <dbaction name="CreateSimilarityDBIndices" mode="transaction">
+            </dbaction>
+
+            <!-- SQlite Similarity Triggers -->
+
+            <dbaction name="CreateSimilarityDBTriggers" mode="transaction">
+                <statement mode="plain">
+                    <!--
+                        If an entry of the ImageHaarMatrix is deleted,
+                        delete all entries from the ImageSimilarity table
+                        for the Haar algorithm (1) where either the first or the second image id is
+                        the deleted one.
+                    -->
+                    CREATE TRIGGER IF NOT EXISTS delete_similarities DELETE ON ImageHaarMatrix
+                    BEGIN
+                        DELETE FROM ImageSimilarity
+                            WHERE ( ImageSimilarity.imageid1=OLD.imageid OR ImageSimilarity.imageid2=OLD.imageid )
+                              AND ( ImageSimilarity.algorithm=1 );
+                    END;
+                </statement>
+            </dbaction>
+
+            <!-- SQlite Similarity Queries -->
+
+            <dbaction name="SelectSimilaritySetting">
+                <statement mode="query">SELECT value FROM SimilaritySettings WHERE keyword=:keyword;</statement>
+            </dbaction>
+
+            <dbaction name="SelectSimilarityLegacySetting">
+                <statement mode="query">SELECT value FROM SimilaritySettings WHERE keyword=:keyword;</statement>
+            </dbaction>
+
+            <dbaction name="ReplaceSimilaritySetting">
+                <statement mode="query">REPLACE INTO SimilaritySettings VALUES (:keyword, :value);</statement>
+            </dbaction>
+
+            <!-- SQlite Migration Statements -->
+
+            <!-- NOTE: Migrate_Cleanup_DB now it's done by the program except for cleanup prepare -->
+            <dbaction name="Migrate_Cleanup_Prepare">
+            </dbaction>
+
+            <dbaction name="Migrate_Read_AlbumRoots"><statement mode="query">
+                SELECT id, label, status, type, identifier, specificPath FROM AlbumRoots;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_AlbumRoots"><statement mode="query">
+                INSERT OR IGNORE INTO AlbumRoots (id, label, status, type, identifier, specificPath) VALUES (:id, :label, :status, :type, :identifier, :specificPath);
+            </statement></dbaction>
+
+            <!-- Note Albums with an icon set are setup after population of the Images table. -->
+            <dbaction name="Migrate_Read_Albums"><statement mode="query">
+                SELECT id, albumRoot, relativePath, date, caption, collection FROM Albums
+                WHERE  albumRoot IN (SELECT id FROM AlbumRoots);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_Albums"><statement mode="query">
+                INSERT OR IGNORE INTO Albums (id, albumRoot, relativePath, date, caption, collection, icon) VALUES (:id, :albumRoot, :relativePath, :date, :caption, :collection, NULL);
+            </statement></dbaction>
+
+            <!-- Populate the Albums icon where set. -->
+            <dbaction name="Migrate_Read_AlbumsExtra"><statement mode="query">
+                SELECT id, icon FROM Albums WHERE icon IS NOT NULL AND icon != 0;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_AlbumsExtra"><statement mode="query">
+                UPDATE OR IGNORE Albums set icon = :icon WHERE id = :id;
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_Images"><statement mode="query">
+                SELECT id, album, name, status, category, modificationDate, fileSize, uniqueHash, manualOrder FROM Images
+                WHERE  album IN (SELECT id FROM Albums);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_Images"><statement mode="query">
+                INSERT OR IGNORE INTO Images (id, album, name, status, category, modificationDate, fileSize, uniqueHash, manualOrder) VALUES (:id, :album, :name, :status, :category, :modificationDate, :fileSize, :uniqueHash, :manualOrder);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageInformation"><statement mode="query">
+                SELECT imageid, rating, creationDate, digitizationDate, orientation, width, height, format, colorDepth, colorModel FROM ImageInformation
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageInformation"><statement mode="query">
+                INSERT OR IGNORE INTO ImageInformation (imageid, rating, creationDate, digitizationDate, orientation, width, height, format, colorDepth, colorModel) VALUES (:imageid, :rating, :creationDate, :digitizationDate, :orientation, :width, :height, :format, :colorDepth, :colorModel);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageMetadata"><statement mode="query">
+                SELECT imageid, make, model, lens, aperture, focalLength, focalLength35, exposureTime, exposureProgram, exposureMode, sensitivity, flash, whiteBalance, whiteBalanceColorTemperature, meteringMode, subjectDistance, subjectDistanceCategory FROM ImageMetadata
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageMetadata"><statement mode="query">
+                INSERT OR IGNORE INTO ImageMetadata (imageid, make, model, lens, aperture, focalLength, focalLength35, exposureTime, exposureProgram, exposureMode, sensitivity, flash, whiteBalance, whiteBalanceColorTemperature, meteringMode, subjectDistance, subjectDistanceCategory) VALUES (:imageid, :make, :model, :lens, :aperture, :focalLength, :focalLength35, :exposureTime, :exposureProgram, :exposureMode, :sensitivity, :flash, :whiteBalance, :whiteBalanceColorTemperature, :meteringMode, :subjectDistance, :subjectDistanceCategory);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_VideoMetadata"><statement mode="query">
+                SELECT imageid, aspectRatio, audioBitRate, audioChannelType, audioCompressor, duration, frameRate, videoCodec FROM VideoMetadata
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_VideoMetadata"><statement mode="query">
+                INSERT OR IGNORE INTO VideoMetadata (imageid, aspectRatio, audioBitRate, audioChannelType, audioCompressor, duration, frameRate, videoCodec) VALUES (:imageid, :aspectRatio, :audioBitRate, :audioChannelType, :audioCompressor, :duration, :frameRate, :videoCodec);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageTagProperties"><statement mode="query">
+                SELECT imageid, tagid, property, value FROM ImageTagProperties
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageTagProperties"><statement mode="query">
+                INSERT OR IGNORE INTO ImageTagProperties (imageid, tagid, property, value) VALUES (:imageid, :tagid, :property, :value);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_TagProperties"><statement mode="query">
+                SELECT tagid, property, value FROM TagProperties;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_TagProperties"><statement mode="query">
+                INSERT OR IGNORE INTO TagProperties (tagid, property, value) VALUES (:tagid, :property, :value);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImagePositions"><statement mode="query">
+                SELECT imageid, latitude, latitudeNumber, longitude, longitudeNumber, altitude, orientation, tilt, roll, accuracy, description FROM ImagePositions
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImagePositions"><statement mode="query">
+                INSERT OR IGNORE INTO ImagePositions (imageid, latitude, latitudeNumber, longitude, longitudeNumber, altitude, orientation, tilt, roll, accuracy, description) VALUES (:imageid, :latitude, :latitudeNumber, :longitude, :longitudeNumber, :altitude, :orientation, :tilt, :roll, :accuracy, :description);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageComments"><statement mode="query">
+                SELECT id, imageid, type, language, author, date, comment FROM ImageComments
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageComments"><statement mode="query">
+                INSERT OR IGNORE INTO ImageComments (id, imageid, type, language, author, date, comment) VALUES (:id, :imageid, :type, :language, :author, :date, :comment);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageCopyright"><statement mode="query">
+                SELECT id, imageid, property, value, extraValue FROM ImageCopyright
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageCopyright"><statement mode="query">
+                INSERT OR IGNORE INTO ImageCopyright (id, imageid, property, value, extraValue) VALUES (:id, :imageid, :property, :value, :extraValue);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_Tags"><statement mode="query">
+                SELECT id, pid, name, CASE WHEN icon = 0 THEN NULL ELSE icon END AS icon, iconkde FROM Tags WHERE id != 0;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_Tags"><statement mode="query">
+                INSERT OR REPLACE INTO Tags (id, pid, name, icon, iconkde) VALUES (:id, :pid, :name, :icon, :iconkde);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageTags"><statement mode="query">
+                SELECT imageid, tagid FROM ImageTags
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageTags"><statement mode="query">
+                INSERT OR IGNORE INTO ImageTags (imageid, tagid) VALUES (:imageid, :tagid);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageProperties"><statement mode="query">
+                SELECT imageid, property, value FROM ImageProperties
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageProperties"><statement mode="query">
+                INSERT OR IGNORE INTO ImageProperties (imageid, property, value) VALUES (:imageid, :property, :value);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageHistory"><statement mode="query">
+                SELECT imageid, uuid, history FROM ImageHistory
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageHistory"><statement mode="query">
+                INSERT OR IGNORE INTO ImageHistory (imageid, uuid, history) VALUES (:imageid, :uuid, :history);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageRelations"><statement mode="query">
+                SELECT subject, object, type FROM ImageRelations
+                INNER  JOIN Images ON subject = Images.id WHERE object IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageRelations"><statement mode="query">
+                INSERT OR IGNORE INTO ImageRelations (subject, object, type) VALUES (:subject, :object, :type);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_Searches"><statement mode="query">
+                SELECT id, type, name, query FROM Searches;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_Searches"><statement mode="query">
+                INSERT OR IGNORE INTO Searches (id, type, name, query) VALUES (:id, :type, :name, :query);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_DownloadHistory"><statement mode="query">
+                SELECT id, identifier, filename, filesize, filedate FROM DownloadHistory;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_DownloadHistory"><statement mode="query">
+                INSERT OR IGNORE INTO DownloadHistory (id, identifier, filename, filesize, filedate) VALUES (:id, :identifier, :filename, :filesize, :filedate);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_Settings"><statement mode="query">
+                SELECT keyword, value FROM Settings
+                WHERE  keyword = 'Locale';
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_Settings"><statement mode="query">
+                INSERT OR IGNORE INTO Settings (keyword, value) VALUES (:keyword, :value);
+            </statement></dbaction>
+
+            <dbaction name="Delete_Thumbnail_ByPath"><statement mode="query">
+                DELETE FROM Thumbnails WHERE id IN (SELECT thumbId FROM FilePaths WHERE path=:path);
+            </statement></dbaction>
+
+            <dbaction name="Delete_Thumbnail_ByUniqueHashId"><statement mode="query">
+                DELETE FROM Thumbnails WHERE id IN (SELECT thumbId FROM UniqueHashes WHERE uniqueHash=:uniqueHash AND fileSize=:filesize);
+            </statement></dbaction>
+
+            <dbaction name="Delete_Thumbnail_ByCustomIdentifier"><statement mode="query">
+                DELETE FROM Thumbnails WHERE id IN (SELECT thumbId FROM CustomIdentifiers WHERE identifier=:identifier);
+            </statement></dbaction>
+
+            <!-- SQlite Migration from Database Version 5 (0.10 - 1.4) to Version 6 (1.5-) -->
+
+            <dbaction name="UpdateSchemaFromV5ToV6" mode="transaction">
+                <statement mode="plain">CREATE TABLE ImageHistory
+                    (imageid INTEGER PRIMARY KEY,
+                    uuid TEXT,
+                    history TEXT);
+                </statement>
+                <statement mode="plain">CREATE TABLE ImageRelations
+                    (subject INTEGER,
+                    object INTEGER,
+                    type INTEGER,
+                    UNIQUE(subject, object, type));
+                </statement>
+                <statement mode="plain">CREATE TABLE TagProperties
+                    (tagid INTEGER,
+                    property TEXT,
+                    value TEXT);
+                </statement>
+                <statement mode="plain">CREATE TABLE ImageTagProperties
+                    (imageid INTEGER,
+                    tagid INTEGER,
+                    property TEXT,
+                    value TEXT);
+                </statement>
+                <statement mode="plain">CREATE INDEX tag_id_index  ON ImageTags (imageid);</statement>
+                <statement mode="plain">CREATE INDEX image_name_index ON Images (name);</statement>
+                <statement mode="plain">CREATE INDEX creationdate_index ON ImageInformation (creationDate);</statement>
+                <statement mode="plain">CREATE INDEX comments_imageid_index ON ImageComments (imageid);</statement>
+                <statement mode="plain">CREATE INDEX copyright_imageid_index ON ImageCopyright (imageid);</statement>
+                <statement mode="plain">CREATE INDEX uuid_index ON ImageHistory (uuid);</statement>
+                <statement mode="plain">CREATE INDEX subject_relations_index ON ImageRelations (subject);</statement>
+                <statement mode="plain">CREATE INDEX object_relations_index ON ImageRelations (object);</statement>
+                <statement mode="plain">CREATE INDEX tagproperties_index ON TagProperties (tagid);</statement>
+                <statement mode="plain">CREATE INDEX imagetagproperties_index ON ImageTagProperties (imageid, tagid);</statement>
+                <statement mode="plain">CREATE INDEX imagetagproperties_imageid_index ON ImageTagProperties (imageid);</statement>
+                <statement mode="plain">CREATE INDEX imagetagproperties_tagid_index ON ImageTagProperties (tagid);</statement>
+                <statement mode="plain">DROP TRIGGER delete_image;</statement>
+                <statement mode="plain">CREATE TRIGGER delete_image DELETE ON Images
+                    BEGIN
+                        DELETE FROM ImageTags          WHERE imageid=OLD.id;
+                        DELETE From ImageHaarMatrix    WHERE imageid=OLD.id;
+                        DELETE From ImageInformation   WHERE imageid=OLD.id;
+                        DELETE From ImageMetadata      WHERE imageid=OLD.id;
+                        DELETE From VideoMetadata      WHERE imageid=OLD.id;
+                        DELETE From ImagePositions     WHERE imageid=OLD.id;
+                        DELETE From ImageComments      WHERE imageid=OLD.id;
+                        DELETE From ImageCopyright     WHERE imageid=OLD.id;
+                        DELETE From ImageProperties    WHERE imageid=OLD.id;
+                        DELETE From ImageHistory       WHERE imageid=OLD.id;
+                        DELETE FROM ImageRelations     WHERE subject=OLD.id OR object=OLD.id;
+                        DELETE FROM ImageTagProperties WHERE imageid=OLD.id;
+                        UPDATE Albums SET icon=null    WHERE icon=OLD.id;
+                        UPDATE Tags SET icon=null      WHERE icon=OLD.id;
+                    END;
+                </statement>
+                <statement mode="plain">DROP TRIGGER delete_tag;</statement>
+                <statement mode="plain">CREATE TRIGGER delete_tag DELETE ON Tags
+                    BEGIN
+                        DELETE FROM ImageTags WHERE tagid=OLD.id;
+                        DELETE FROM TagProperties WHERE tagid=OLD.id;
+                        DELETE FROM ImageTagProperties WHERE tagid=OLD.id;
+                    END;
+                </statement>
+            </dbaction>
+
+            <dbaction name="UpdateSchemaFromV6ToV7" mode="transaction">
+                <statement mode="plain"> CREATE TABLE VideoMetadata
+                    (imageid INTEGER PRIMARY KEY,
+                    aspectRatio TEXT,
+                    audioBitRate TEXT,
+                    audioChannelType TEXT,
+                    audioCompressor TEXT,
+                    duration TEXT,
+                    frameRate TEXT,
+                    exposureProgram INTEGER,
+                    videoCodec TEXT);
+                </statement>
+                <statement mode="plain">DROP TRIGGER delete_image;</statement>
+                <statement mode="plain">CREATE TRIGGER delete_image DELETE ON Images
+                    BEGIN
+                        DELETE FROM ImageTags          WHERE imageid=OLD.id;
+                        DELETE From ImageHaarMatrix    WHERE imageid=OLD.id;
+                        DELETE From ImageInformation   WHERE imageid=OLD.id;
+                        DELETE From ImageMetadata      WHERE imageid=OLD.id;
+                        DELETE From VideoMetadata      WHERE imageid=OLD.id;
+                        DELETE From ImagePositions     WHERE imageid=OLD.id;
+                        DELETE From ImageComments      WHERE imageid=OLD.id;
+                        DELETE From ImageCopyright     WHERE imageid=OLD.id;
+                        DELETE From ImageProperties    WHERE imageid=OLD.id;
+                        DELETE From ImageHistory       WHERE imageid=OLD.id;
+                        DELETE FROM ImageRelations     WHERE subject=OLD.id OR object=OLD.id;
+                        DELETE FROM ImageTagProperties WHERE imageid=OLD.id;
+                        UPDATE Albums SET icon=null    WHERE icon=OLD.id;
+                        UPDATE Tags SET icon=null      WHERE icon=OLD.id;
+                    END;
+                </statement>
+            </dbaction>
+
+            <dbaction name="UpdateSchemaFromV7ToV9" mode="transaction">
+                <!-- Nothing to do for SQLite -->
+            </dbaction>
+
+            <dbaction name="UpdateSchemaFromV9ToV10" mode="transaction">
+                <statement mode="plain">DROP TABLE IF EXISTS ImageHaarMatrix;</statement>
+                <statement mode="plain">DROP TRIGGER delete_image;</statement>
+                <statement mode="plain">CREATE TRIGGER delete_image DELETE ON Images
+                    BEGIN
+                        DELETE FROM ImageTags          WHERE imageid=OLD.id;
+                        DELETE From ImageInformation   WHERE imageid=OLD.id;
+                        DELETE From ImageMetadata      WHERE imageid=OLD.id;
+                        DELETE From VideoMetadata      WHERE imageid=OLD.id;
+                        DELETE From ImagePositions     WHERE imageid=OLD.id;
+                        DELETE From ImageComments      WHERE imageid=OLD.id;
+                        DELETE From ImageCopyright     WHERE imageid=OLD.id;
+                        DELETE From ImageProperties    WHERE imageid=OLD.id;
+                        DELETE From ImageHistory       WHERE imageid=OLD.id;
+                        DELETE FROM ImageRelations     WHERE subject=OLD.id OR object=OLD.id;
+                        DELETE FROM ImageTagProperties WHERE imageid=OLD.id;
+                        UPDATE Albums SET icon=null    WHERE icon=OLD.id;
+                        UPDATE Tags SET icon=null      WHERE icon=OLD.id;
+                    END;
+                </statement>
+                <statement mode="plain">ALTER TABLE Images ADD manualOrder INTEGER;</statement>
+            </dbaction>
+
+            <dbaction name="UpdateThumbnailsDBSchemaFromV1ToV2" mode="transaction">
+                <statement mode="plain">CREATE TABLE CustomIdentifiers
+                    (identifier TEXT,
+                    thumbId INTEGER,
+                    UNIQUE(identifier));
+                </statement>
+                <statement mode="plain">CREATE INDEX id_customIdentifiers ON CustomIdentifiers (thumbId);</statement>
+                <statement mode="plain">DROP TRIGGER delete_thumbnails;</statement>
+                <statement mode="plain">CREATE TRIGGER delete_thumbnails DELETE ON Thumbnails
+                    BEGIN
+                        DELETE FROM UniqueHashes WHERE UniqueHashes.thumbId = OLD.id;
+                        DELETE FROM FilePaths WHERE FilePaths.thumbId = OLD.id;
+                        DELETE FROM CustomIdentifiers WHERE CustomIdentifiers.thumbId = OLD.id;
+                    END;
+                </statement>
+            </dbaction>
+
+            <dbaction name="UpdateThumbnailsDBSchemaFromV2ToV3" mode="transaction">
+                <!-- Nothing to do for SQLite -->
+            </dbaction>
+
+            <!-- 
+              statements for shrinking the databases. We need actions for each database since MySQL has only vacuum
+              and integtrity check for tables. Thus, MySQL needs at least one action per table.
+              Vacuum (SQLite) creates a temporary database that replaces the current one on successful vacuuming.
+            -->
+
+            <dbaction name="vacuumCoreDB">
+                <statement mode="query">VACUUM;</statement>
+            </dbaction>
+
+            <dbaction name="vacuumThumbnailsDB">
+                <statement mode="query">VACUUM;</statement>
+            </dbaction>
+
+            <dbaction name="vacuumRecognitionDB">
+                <statement mode="query">VACUUM;</statement>
+            </dbaction>
+
+            <dbaction name="vacuumSimilarityDB">
+                <statement mode="query">VACUUM;</statement>
+            </dbaction>
+
+            <dbaction name="checkCoreDbIntegrity">
+                <statement mode="query">pragma integrity_check;</statement>
+            </dbaction>
+
+            <dbaction name="checkThumbnailsDbIntegrity">
+                <statement mode="query">pragma integrity_check;</statement>
+            </dbaction>
+
+            <dbaction name="checkRecognitionDbIntegrity">
+                <statement mode="query">pragma integrity_check;</statement>
+            </dbaction>
+
+            <dbaction name="checkSimilarityDbIntegrity">
+                <statement mode="query">pragma integrity_check;</statement>
+            </dbaction>
+
+        </dbactions>
+
+    </database>
+
+
+
+    <!-- =============================================================================================================== -->
+    <!-- ========================================== MYSQL DATABASE STATEMENTS ========================================== -->
+    <!-- =============================================================================================================== -->
+
+
+
+    <database name="QMYSQL">
+
+        <!-- NOTE: default settings for Mysql Internal server -->
+        <hostName>$$DBHOSTNAME$$</hostName>
+        <databaseName>digikam</databaseName>
+        <userName>root</userName>
+        <password></password>
+        <port>$$DBPORT$$</port>
+        <connectoptions>$$DBOPTIONS$$</connectoptions>
+
+        <dbactions>
+
+            <!-- Mysql check privileges rules -->
+
+            <dbaction name="CheckPriv_CREATE_TRIGGER">
+            </dbaction>
+
+            <dbaction name="CheckPriv_DROP_TRIGGER">
+            </dbaction>
+
+            <dbaction name="CheckPriv_CREATE_TABLE">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS PrivCheck
+                    (id   INT,
+                    name VARCHAR(35))
+                    ENGINE InnoDB;
+                </statement>
+            </dbaction>
+
+            <dbaction name="CheckPriv_ALTER_TABLE">
+                <statement mode="plain">
+                    ALTER TABLE PrivCheck DROP COLUMN name;
+                </statement>
+            </dbaction>
+
+            <dbaction name="CheckPriv_DROP_TABLE">
+                <statement mode="plain">
+                    DROP TABLE PrivCheck;
+                </statement>
+            </dbaction>
+
+            <dbaction name="CheckPriv_Cleanup">
+                <statement mode="plain">
+                    DROP TABLE IF EXISTS PrivCheck;
+                </statement>
+            </dbaction>
+
+            <!-- Mysql Core Schema Database -->
+
+            <dbaction name="CreateDB" mode="transaction">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS AlbumRoots
+                    (id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+                    label LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    status INTEGER NOT NULL,
+                    type INTEGER NOT NULL,
+                    identifier LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    specificPath LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    UNIQUE(identifier(127), specificPath(128)))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Albums
+                    (id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+                    albumRoot INTEGER NOT NULL,
+                    relativePath LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                    date DATE,
+                    caption LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    collection LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    icon BIGINT,
+                    CONSTRAINT Albums_AlbumRoots FOREIGN KEY (albumRoot) REFERENCES AlbumRoots (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE(albumRoot, relativePath(255)))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Images
+                    (id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+                    album INTEGER,
+                    name LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                    status INTEGER NOT NULL,
+                    category INTEGER NOT NULL,
+                    modificationDate DATETIME,
+                    fileSize BIGINT,
+                    uniqueHash VARCHAR(128),
+                    manualOrder BIGINT,
+                    CONSTRAINT Images_Albums FOREIGN KEY (album) REFERENCES Albums (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE (album, name(255)))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">ALTER TABLE Albums
+                    ADD CONSTRAINT Albums_Images FOREIGN KEY (icon) REFERENCES Images (id) ON DELETE SET NULL ON UPDATE CASCADE;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageInformation
+                    (imageid BIGINT PRIMARY KEY,
+                    rating INTEGER,
+                    creationDate DATETIME,
+                    digitizationDate DATETIME,
+                    orientation INTEGER,
+                    width INTEGER,
+                    height INTEGER,
+                    format LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    colorDepth INTEGER,
+                    colorModel INTEGER,
+                    CONSTRAINT ImageInformation_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageMetadata
+                    (imageid BIGINT PRIMARY KEY,
+                    make LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    model LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    lens LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    aperture REAL,
+                    focalLength REAL,
+                    focalLength35 REAL,
+                    exposureTime REAL,
+                    exposureProgram INTEGER,
+                    exposureMode INTEGER,
+                    sensitivity INTEGER,
+                    flash INTEGER,
+                    whiteBalance INTEGER,
+                    whiteBalanceColorTemperature INTEGER,
+                    meteringMode INTEGER,
+                    subjectDistance REAL,
+                    subjectDistanceCategory INTEGER,
+                    CONSTRAINT ImageMetadata_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS VideoMetadata
+                    (imageid BIGINT PRIMARY KEY,
+                    aspectRatio TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    audioBitRate TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    audioChannelType TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    audioCompressor TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    duration TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    frameRate TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    exposureProgram INTEGER,
+                    videoCodec TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    CONSTRAINT VideoMetadata_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImagePositions
+                    (imageid BIGINT PRIMARY KEY,
+                    latitude LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    latitudeNumber REAL,
+                    longitude LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    longitudeNumber REAL,
+                    altitude REAL,
+                    orientation REAL,
+                    tilt REAL,
+                    roll REAL,
+                    accuracy REAL,
+                    description LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    CONSTRAINT ImagePositions_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageComments
+                    (id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+                    imageid BIGINT,
+                    type INTEGER,
+                    language VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    author LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    date DATETIME,
+                    comment LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    CONSTRAINT ImageComments_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE(imageid, type, language, author(202)))
+                    ENGINE InnoDB;</statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageCopyright
+                    (id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+                    imageid BIGINT,
+                    property LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    extraValue LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    CONSTRAINT ImageCopyright_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE(imageid, property(110), value(111), extraValue(111)))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Tags
+                    (id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+                    pid INTEGER,
+                    name LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                    icon BIGINT,
+                    iconkde LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    lft INTEGER NOT NULL,
+                    rgt INTEGER NOT NULL,
+                    CONSTRAINT Tags_Images FOREIGN KEY (icon) REFERENCES Images (id) ON DELETE SET NULL ON UPDATE CASCADE,
+                    UNIQUE(pid, name(100)))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageTags
+                    (imageid BIGINT NOT NULL,
+                    tagid INTEGER NOT NULL,
+                    CONSTRAINT ImageTags_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    CONSTRAINT ImageTags_Tags FOREIGN KEY (tagid) REFERENCES Tags (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE (imageid, tagid))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain"> CREATE TABLE IF NOT EXISTS ImageProperties
+                    (imageid BIGINT NOT NULL,
+                    property LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                    value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                    CONSTRAINT ImageProperties_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE (imageid, property(255)))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Searches
+                    (id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+                    type INTEGER,
+                    name LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                    query LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS DownloadHistory
+                    (id BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+                    identifier LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    filename LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    filesize BIGINT,
+                    filedate DATETIME,
+                    UNIQUE(identifier(164), filename(165), filesize, filedate))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Settings
+                    (keyword LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                    value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    UNIQUE(keyword(255)))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageHistory
+                    (imageid BIGINT PRIMARY KEY,
+                    uuid VARCHAR(128),
+                    history LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    CONSTRAINT ImageHistory_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageRelations
+                    (subject BIGINT,
+                    object BIGINT,
+                    type INTEGER,
+                    CONSTRAINT ImageRelations_ImagesS FOREIGN KEY (subject) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    CONSTRAINT ImageRelations_ImagesO FOREIGN KEY (object) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE(subject, object, type))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS TagProperties
+                    (tagid INTEGER,
+                    property TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    CONSTRAINT TagProperties_Tags FOREIGN KEY (tagid) REFERENCES Tags (id) ON DELETE CASCADE ON UPDATE CASCADE)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageTagProperties
+                    (imageid BIGINT,
+                    tagid INTEGER,
+                    property TEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    CONSTRAINT ImageTagProperties_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    CONSTRAINT ImageTagProperties_Tags FOREIGN KEY (tagid) REFERENCES Tags (id) ON DELETE CASCADE ON UPDATE CASCADE)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">
+                    CREATE OR REPLACE VIEW TagsTree 
+                        AS
+                        SELECT id, pid
+                        FROM Tags;
+                </statement>
+            </dbaction>
+
+            <!-- Mysql Core Indexes -->
+
+            <dbaction name="CreateIndices" mode="transaction">
+                <statement mode="plain">
+                    DROP PROCEDURE IF EXISTS create_index_if_not_exists;
+                </statement>
+                <statement mode="plain">
+                    CREATE PROCEDURE create_index_if_not_exists(table_name_vc varchar(50), index_name_vc varchar(50), field_list_vc varchar(1024))
+                    BEGIN
+
+                    set @Index_cnt = (
+                        SELECT COUNT(1) cnt
+                        FROM INFORMATION_SCHEMA.STATISTICS
+                        WHERE CONVERT(DATABASE() USING latin1) = CONVERT(TABLE_SCHEMA USING latin1)
+                          AND CONVERT(table_name USING latin1) = CONVERT(table_name_vc USING latin1)
+                          AND CONVERT(index_name USING latin1) = CONVERT(index_name_vc USING latin1)
+                    );
+
+                    IF IFNULL(@Index_cnt, 0) = 0 THEN
+                        set @index_sql = CONCAT( 
+                            CONVERT( 'ALTER TABLE ' USING latin1),
+                            CONVERT( table_name_vc USING latin1),
+                            CONVERT( ' ADD INDEX ' USING latin1),
+                            CONVERT( index_name_vc USING latin1),
+                            CONVERT( '(' USING latin1),
+                            CONVERT( field_list_vc USING latin1),
+                            CONVERT( ');' USING latin1)
+                        );
+                        PREPARE stmt FROM @index_sql;
+                        EXECUTE stmt;
+                        DEALLOCATE PREPARE stmt;
+                    END IF;
+                    END;
+                </statement>
+                <statement mode="plain">CALL create_index_if_not_exists('Images','dir_index','album');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('Images','hash_index','uniqueHash');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageTags','tag_index','tagid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageTags','tag_id_index','imageid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('Images','image_name_index','name(255)');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageInformation','creationdate_index','creationDate');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageComments','comments_imageid_index','imageid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageCopyright','copyright_imageid_index','imageid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageHistory','uuid_index','uuid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageRelations','subject_relations_index','subject');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageRelations','object_relations_index','object');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('TagProperties','tagproperties_index','tagid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageTagProperties','imagetagproperties_index','imageid, tagid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageTagProperties','imagetagproperties_imageid_index','imageid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageTagProperties','imagetagproperties_tagid_index','tagid');</statement>
+            </dbaction>
+
+            <!-- Mysql Core Triggers -->
+
+            <dbaction name="CreateTriggers" mode="transaction">
+<!-- Note move_tagstree does not exist for mysql
+                <statement mode="plain">DROP TRIGGER IF EXISTS move_tagstree;</statement>
+-->
+
+                <statement mode="plain">
+                    SELECT
+                        @minLeft := IF(ISNULL(MIN(lft)), 1, MIN(lft)-1),
+                        @maxRight := IF(ISNULL(MAX(rgt)), 2, MAX(rgt)+1)
+                    FROM Tags
+                    WHERE id >= 0 AND pid >= 0;
+                </statement>
+                <statement mode="plain">SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO';</statement>
+                <statement mode="plain">
+                    REPLACE INTO Tags
+                    (id, pid, name, icon, iconkde, lft, rgt)
+                    VALUES
+                    (0, -1, '_Digikam_root_tag_', NULL, NULL, @minLeft, @maxRight);
+                </statement>
+                <statement mode="plain">SET SQL_MODE=@OLD_SQL_MODE;</statement>
+            </dbaction>
+
+            <dbaction name="checkIfDatabaseExists">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album WHERE Albums.id=:albumID ORDER BY Images.name;</statement>
+            </dbaction>
+
+            <dbaction name="getItemURLsInAlbumByItemName">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album WHERE Albums.id=:albumID ORDER BY Images.name;</statement>
+            </dbaction>
+
+            <!-- NOTE: Don't collate on the path - this is to maintain the same behavior
+                       that happens when sort order is "By Path"
+            -->
+            <dbaction name="getItemURLsInAlbumByItemPath">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album WHERE Albums.id=:albumID ORDER BY Albums.relativePath,Images.name;</statement>
+            </dbaction>
+
+            <dbaction name="getItemURLsInAlbumByItemDate">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album INNER JOIN ImageInformation ON ImageInformation.imageid=Images.id WHERE Albums.id=:albumID ORDER BY ImageInformation.creationDate;</statement>
+            </dbaction>
+
+            <dbaction name="getItemURLsInAlbumByItemRating">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album INNER JOIN ImageInformation ON ImageInformation.imageid=Images.id WHERE Albums.id=:albumID ORDER BY ImageInformation.rating DESC;</statement>
+            </dbaction>
+
+            <dbaction name="getItemURLsInAlbumNoItemSorting">
+                <statement mode="query">SELECT Albums.relativePath, Images.name FROM Images INNER JOIN Albums ON Albums.id=Images.album WHERE Albums.id=:albumID;</statement>
+            </dbaction>
+
+            <dbaction name="changeItemInformation">
+                <statement mode="query">INSERT INTO ImageInformation ( imageid, :fieldList ) VALUES ( :id, :valueList ) ON DUPLICATE KEY UPDATE :fieldValueList;</statement>
+            </dbaction>
+
+            <dbaction name="changeImageHistory">
+                <statement mode="query">INSERT INTO ImageHistory( imageid, :fieldList ) VALUES ( :id, :valueList ) ON DUPLICATE KEY UPDATE :fieldValueList;</statement>
+            </dbaction>
+
+            <dbaction name="InsertTag" mode="transaction">
+                <statement mode="query">SELECT @myLeft := lft FROM Tags WHERE id = :tagPID;</statement>
+                <statement mode="query">SELECT @myLeft := IF (@myLeft is null, 0, @myLeft);</statement>
+                <statement mode="query">UPDATE Tags SET rgt = rgt + 2 WHERE rgt > @myLeft;</statement>
+                <statement mode="query">UPDATE Tags SET lft = lft + 2 WHERE lft > @myLeft;</statement>
+                <statement mode="query">INSERT INTO Tags(name, pid, lft, rgt) VALUES(:tagname, :tagPID, @myLeft + 1, @myLeft + 2);</statement>
+            </dbaction>
+
+            <dbaction name="DeleteTag" mode="transaction">
+                <statement mode="query">SELECT @myLeft := lft FROM Tags WHERE id = :tagID;</statement>
+                <statement mode="query">SELECT @myLeft := IF (@myLeft is null, 0, @myLeft);</statement>
+                <statement mode="query">DELETE FROM Tags WHERE id = :tagID;</statement>
+                <statement mode="query">UPDATE Tags SET rgt = rgt - 2 WHERE rgt > @myLeft;</statement>
+                <statement mode="query">UPDATE Tags SET lft = lft - 2 WHERE lft > @myLeft;</statement>
+            </dbaction>
+
+            <dbaction name="MoveTagTree" mode="transaction">
+                <statement mode="query">SELECT @myLeft := lft, @myRight := rgt, @myWidth := rgt - lft + 1
+                                        FROM Tags WHERE id = :tagID;</statement>
+                <statement mode="query">UPDATE Tags SET rgt = rgt * -1, lft = lft * -1
+                                        WHERE lft BETWEEN @myLeft AND @myRight;</statement>
+                <statement mode="query">UPDATE Tags SET rgt = rgt - @myWidth WHERE rgt > @myRight;</statement>
+                <statement mode="query">UPDATE Tags SET lft = lft - @myWidth WHERE lft > @myRight;</statement>
+                <statement mode="query">SELECT @myNewLeft := lft FROM Tags WHERE id = :newTagPID;</statement>
+                <statement mode="query">SELECT @myNewLeft := IF (@myNewLeft is null, 0, @myNewLeft);</statement>
+                <statement mode="query">UPDATE Tags SET rgt = rgt + @myWidth WHERE rgt > @myNewLeft;</statement>
+                <statement mode="query">UPDATE Tags SET lft = lft + @myWidth WHERE lft > @myNewLeft;</statement>
+                <statement mode="query">UPDATE Tags SET lft = lft * -1 - @myLeft + @myNewLeft + 1,
+                                                        rgt = rgt * -1 - @myLeft + @myNewLeft + 1
+                                        WHERE lft * -1 BETWEEN @myLeft AND @myRight;</statement>
+            </dbaction>
+
+            <dbaction name="deleteAlbumRoot" mode="transaction">
+                <statement mode="query">SELECT @albumID:=id FROM Albums WHERE albumRoot=:albumRoot;</statement>
+                <statement mode="query">DELETE FROM Albums WHERE albumRoot=:albumRoot;</statement>
+                <statement mode="query">DELETE FROM Images WHERE Images.album=@albumID;</statement>
+            </dbaction>
+
+            <dbaction name="deleteAlbumRootPath" mode="transaction">
+                <statement mode="query">SELECT @albumID:=id FROM Albums WHERE albumRoot=:albumRoot AND BINARY relativePath=:relativePath;</statement>
+                <statement mode="query">DELETE FROM Albums WHERE albumRoot=:albumRoot AND BINARY relativePath=:relativePath;</statement>
+                <statement mode="query">DELETE FROM Images WHERE Images.album=@albumID;</statement>
+            </dbaction>
+
+            <dbaction name="deleteAlbumID" mode="transaction">
+                <statement mode="query">SELECT @albumID:=id FROM Albums WHERE Albums.id=:albumId;</statement>
+                <statement mode="query">DELETE FROM Albums WHERE Albums.id=:albumId;</statement>
+                <statement mode="query">DELETE FROM Images WHERE Images.album=@albumID;</statement>
+            </dbaction>
+
+            <dbaction name="GetItemURLsInTagRecursive">
+                <statement mode="query">
+                    SELECT DISTINCT alb.albumRoot, alb.relativePath, img.name
+                    FROM (
+                           Images AS img
+                      JOIN Albums AS alb
+                        ON alb.id = img.album
+                      JOIN ImageTags AS ita
+                        ON ita.imageid = img.id
+                    ) JOIN (
+                      Tags As tp
+                      JOIN Tags As tc
+                        ON tc.lft BETWEEN tp.lft AND tp.rgt
+                    )
+                    ON tc.id = ita.tagID
+                    WHERE img.status = 1
+                      AND tp.id = :tagID
+                    ORDER BY img.name;
+                </statement>
+            </dbaction>
+
+            <dbaction name="GetItemURLsInTag">
+                <statement mode="query">
+                    SELECT alb.albumRoot, alb.relativePath, img.name
+                    FROM Albums AS alb
+                    JOIN Images AS img
+                      ON alb.id = img.album
+                    JOIN ImageTags AS it
+                      ON it.imageid = img.id
+                    WHERE img.status = 1
+                      AND it.tagid = :tagID;
+                </statement>
+            </dbaction>
+
+            <dbaction name="getItemIDsInTagRecursive">
+                <statement mode="query">
+                    SELECT DISTINCT ita.imageid
+                    FROM (
+                           Images AS img
+                      JOIN ImageTags AS ita
+                        ON ita.imageid = img.id
+                    ) JOIN (
+                      Tags As tp
+                      JOIN Tags As tc
+                        ON tc.lft BETWEEN tp.lft AND tp.rgt
+                    )
+                    ON tc.id = ita.tagID
+                    WHERE img.status = 1
+                      AND tp.id = :tagID
+                    ORDER BY img.name;
+                </statement>
+            </dbaction>
+
+            <dbaction name="getItemIDsInTag">
+                <statement mode="query">SELECT imageid FROM ImageTags JOIN Images ON ImageTags.imageid=Images.id
+                                        WHERE Images.status=1 AND tagid=:tagID;
+                </statement>
+            </dbaction>
+
+            <dbaction name="listTagRecursive">
+                <statement mode="query">
+                    SELECT DISTINCT
+                        img.id, img.name, img.album,
+                        alb.albumRoot,
+                        inf.rating, img.category,
+                        inf.format, inf.creationDate,
+                        img.modificationDate, img.fileSize,
+                        inf.width, inf.height
+                    FROM (
+                      Images AS img
+                      JOIN ImageInformation AS inf
+                        ON img.id=inf.imageid
+                      JOIN Albums AS alb
+                        ON alb.id=img.album
+                      JOIN ImageTags AS ita
+                        ON ita.imageid = img.id
+                    ) JOIN (
+                      Tags As tp
+                      JOIN Tags As tc
+                        ON tc.lft BETWEEN tp.lft AND tp.rgt
+                    )
+                    ON tc.id = ita.tagID
+                    WHERE img.status = 1
+                      AND tp.id = :tagID
+                    ORDER BY inf.rating DESC, img.name ASC;
+                </statement>
+            </dbaction>
+
+            <dbaction name="listTag">
+                <statement mode="query">
+                    SELECT DISTINCT
+                        img.id, img.name, img.album,
+                        alb.albumRoot,
+                        inf.rating, img.category,
+                        inf.format, inf.creationDate,
+                        img.modificationDate, img.fileSize,
+                        inf.width, inf.height
+                    FROM
+                      Images AS img
+                      JOIN ImageInformation AS inf
+                        ON img.id=inf.imageid
+                      JOIN Albums AS alb
+                        ON alb.id=img.album
+                      JOIN ImageTags AS ita
+                        ON ita.imageid = img.id
+                    WHERE img.status = 1
+                      AND ita.tagID = :tagID
+                    ORDER BY inf.rating DESC, img.name ASC;
+                </statement>
+            </dbaction>
+
+            <!-- Mysql Thumbnails Schema Database -->
+
+            <dbaction name="CreateThumbnailsDB" mode="transaction">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Thumbnails
+                    (id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                    type INTEGER,
+                    modificationDate DATETIME,
+                    orientationHint INTEGER,
+                    data LONGBLOB)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS UniqueHashes
+                    (uniqueHash VARCHAR(128),
+                    fileSize BIGINT,
+                    thumbId BIGINT,
+                    CONSTRAINT UniqueHashes_Thumbnails FOREIGN KEY (thumbId) REFERENCES Thumbnails (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE(uniqueHash, fileSize))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS FilePaths
+                    (path LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    thumbId BIGINT,
+                    CONSTRAINT FilePaths_Thumbnails FOREIGN KEY (thumbId) REFERENCES Thumbnails (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE(path(255)))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS CustomIdentifiers
+                    (identifier LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    thumbId BIGINT,
+                    CONSTRAINT CustomIdentifiers_Thumbnails FOREIGN KEY (thumbId) REFERENCES Thumbnails (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    UNIQUE(identifier(255)))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ThumbSettings
+                    (keyword LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                    value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    UNIQUE(keyword(255)))
+                    ENGINE InnoDB;
+                </statement>
+            </dbaction>
+
+            <!-- Mysql Thumbnails Indexes -->
+
+            <dbaction name="CreateThumbnailsDBIndices" mode="transaction">
+                <statement mode="plain">
+                    DROP PROCEDURE IF EXISTS create_index_if_not_exists;
+                </statement>
+                <statement mode="plain">
+                    CREATE PROCEDURE create_index_if_not_exists(table_name_vc varchar(50), index_name_vc varchar(50), field_list_vc varchar(1024))
+                    BEGIN
+
+                    set @Index_cnt = (
+                        SELECT COUNT(1) cnt
+                        FROM INFORMATION_SCHEMA.STATISTICS
+                        WHERE CONVERT(DATABASE() USING latin1) = CONVERT(TABLE_SCHEMA USING latin1)
+                          AND CONVERT(table_name USING latin1) = CONVERT(table_name_vc USING latin1)
+                          AND CONVERT(index_name USING latin1) = CONVERT(index_name_vc USING latin1)
+                    );
+
+                    IF IFNULL(@Index_cnt, 0) = 0 THEN
+                        set @index_sql = CONCAT( 
+                            CONVERT( 'ALTER TABLE ' USING latin1),
+                            CONVERT( table_name_vc USING latin1),
+                            CONVERT( ' ADD INDEX ' USING latin1),
+                            CONVERT( index_name_vc USING latin1),
+                            CONVERT( '(' USING latin1),
+                            CONVERT( field_list_vc USING latin1),
+                            CONVERT( ');' USING latin1)
+                        );
+                        PREPARE stmt FROM @index_sql;
+                        EXECUTE stmt;
+                        DEALLOCATE PREPARE stmt;
+                    END IF;
+                    END;
+                </statement>
+                <statement mode="plain">CALL create_index_if_not_exists('UniqueHashes','id_uniqueHashes','thumbId');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('FilePaths','id_filePaths','thumbId');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('CustomIdentifiers','id_customIdentifiers','thumbId');</statement>
+            </dbaction>
+
+            <!-- Mysql Thumbnails Trigger -->
+
+            <dbaction name="CreateThumbnailsDBTrigger" mode="transaction"></dbaction>
+
+            <!-- Mysql Thumbnails Queries -->
+
+            <dbaction name="SelectThumbnailSetting">
+                <statement mode="query">SELECT value FROM ThumbSettings WHERE keyword=:keyword;</statement>
+            </dbaction>
+
+            <dbaction name="SelectThumbnailLegacySetting">
+                <statement mode="query">SELECT value FROM Settings WHERE keyword=:keyword;</statement>
+            </dbaction>
+
+            <dbaction name="ReplaceThumbnailSetting">
+                <statement mode="query">REPLACE INTO ThumbSettings VALUES (:keyword, :value);</statement>
+            </dbaction>
+
+            <!-- Mysql Face Schema Database -->
+            <!--
+                The face database file contains the tables listed below:
+                Identities:           contains a list of identities with type.
+                IdentityAttributes:   contains identity attributes as text name and UUID.
+                OpenCVLBPHRecognizer: this table currently will have only one entry, and was used with LPBH recognition algorithm (deprecated).
+                OpenCVLBPHistograms:  contains face histogram data for each identity for the LBPH recognition algorithm that was used when the training was done (deprecated).
+                FaceMatrices:         contains face matrices data for each identity for the DNN recognition algorithm that was used when the training was done.
+                Settings:             includes database version rules.
+            -->
+
+            <dbaction name="CreateFaceDB" mode="transaction">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS Identities
+                    (id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                    `type` INTEGER)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS IdentityAttributes
+                    (id INTEGER,
+                    `type` INTEGER,
+                    attribute LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    `value` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    CONSTRAINT IdentityAttributes_Identities FOREIGN KEY (id) REFERENCES Identities (id) ON DELETE CASCADE ON UPDATE CASCADE)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS FaceSettings
+                    (keyword LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                    `value` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    UNIQUE(keyword(255)))
+                    ENGINE InnoDB;
+                </statement>
+            </dbaction>
+
+            <dbaction name="CreateFaceDBOpenCVLBPH" mode="transaction">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS OpenCVLBPHRecognizer
+                    (id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                    version INTEGER,
+                    radius INTEGER,
+                    neighbors INTEGER,
+                    grid_x INTEGER,
+                    grid_y INTEGER)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS OpenCVLBPHistograms
+                    (id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                    recognizerid INTEGER,
+                    identity INTEGER,
+                    `context` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    `type` INTEGER,
+                    `rows` INTEGER,
+                    `cols` INTEGER,
+                    `data` LONGBLOB)
+                    ENGINE InnoDB;
+                </statement>
+            </dbaction>
+
+            <dbaction name="CreateFaceDBFaceMatrices" mode="transaction">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS FaceMatrices
+                    (id INTEGER PRIMARY KEY AUTO_INCREMENT,
+                    identity INTEGER,
+                    `context` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    `type` INTEGER,
+                    `rows` INTEGER,
+                    `cols` INTEGER,
+                    `data` LONGBLOB,
+                    vecdata LONGBLOB)
+                    ENGINE InnoDB;
+                </statement>
+            </dbaction>
+
+            <!-- Mysql face Indexes -->
+
+            <dbaction name="CreateFaceIndices" mode="transaction">
+                <statement mode="plain">
+                    DROP PROCEDURE IF EXISTS create_index_if_not_exists;
+                </statement>
+                <statement mode="plain">
+                    CREATE PROCEDURE create_index_if_not_exists(table_name_vc varchar(50), index_name_vc varchar(50), field_list_vc varchar(1024))
+                    BEGIN
+
+                    set @Index_cnt = (
+                        SELECT COUNT(1) cnt
+                        FROM INFORMATION_SCHEMA.STATISTICS
+                        WHERE CONVERT(DATABASE() USING latin1) = CONVERT(TABLE_SCHEMA USING latin1)
+                          AND CONVERT(table_name USING latin1) = CONVERT(table_name_vc USING latin1)
+                          AND CONVERT(index_name USING latin1) = CONVERT(index_name_vc USING latin1)
+                    );
+
+                    IF IFNULL(@Index_cnt, 0) = 0 THEN
+                        set @index_sql = CONCAT( 
+                            CONVERT( 'ALTER TABLE ' USING latin1),
+                            CONVERT( table_name_vc USING latin1),
+                            CONVERT( ' ADD INDEX ' USING latin1),
+                            CONVERT( index_name_vc USING latin1),
+                            CONVERT( '(' USING latin1),
+                            CONVERT( field_list_vc USING latin1),
+                            CONVERT( ');' USING latin1)
+                        );
+                        PREPARE stmt FROM @index_sql;
+                        EXECUTE stmt;
+                        DEALLOCATE PREPARE stmt;
+                    END IF;
+                    END;
+                </statement>
+                <statement mode="plain">CALL create_index_if_not_exists('IdentityAttributes','identityattributes_index','id');</statement>
+            </dbaction>
+
+            <!-- Mysql Face Triggers -->
+
+            <dbaction name="CreateFaceTriggers" mode="transaction">
+            </dbaction>
+
+            <!-- Mysql Face Queries -->
+
+            <dbaction name="SelectFaceSetting">
+                <statement mode="query">SELECT value FROM FaceSettings WHERE keyword=:keyword;</statement>
+            </dbaction>
+
+            <dbaction name="ReplaceFaceSetting">
+                <statement mode="query">REPLACE INTO FaceSettings VALUES (:keyword, :value);</statement>
+            </dbaction>
+
+
+            <!-- Mysql Similarity Schema Database -->
+
+            <dbaction name="CreateSimilarityDB" mode="transaction">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageSimilarity
+                    (imageid1 BIGINT NOT NULL,
+                    imageid2 BIGINT NOT NULL,
+                    algorithm INTEGER,
+                    value DOUBLE,
+                    CONSTRAINT Similar UNIQUE(imageid1, imageid2, algorithm))
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageHaarMatrix
+                    (imageid BIGINT PRIMARY KEY,
+                    modificationDate DATETIME,
+                    uniqueHash LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    matrix LONGBLOB)
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS SimilaritySettings
+                    (keyword LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+                    `value` LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    UNIQUE(keyword(255)))
+                    ENGINE InnoDB;
+                </statement>
+            </dbaction>
+
+            <!-- Mysql Similarity Indexes -->
+            <dbaction name="CreateSimilarityDBIndices" mode="transaction">
+            </dbaction>
+
+            <!-- Mysql Similarity Triggers -->
+            <dbaction name="CreateSimilarityDBTriggers" mode="transaction">
+                    <!--
+                <statement mode="plain">
+
+                        If an entry of the ImageHaarMatrix is deleted,
+                        delete all entries from the ImageSimilarity table
+                        for the Haar algorithm (1) where either the first or the second image id is
+                        the deleted one.
+
+                    CREATE TRIGGER IF NOT EXISTS delete_similarities AFTER DELETE ON ImageHaarMatrix
+                    FOR EACH ROW
+                    BEGIN
+                        DELETE FROM ImageSimilarity
+                            WHERE ( ImageSimilarity.imageid1=OLD.id OR ImageSimilarity.imageid2=OLD.id )
+                              AND ( ImageSimilarity.algorithm=1 );
+                    END;
+
+                </statement>
+                    -->
+            </dbaction>
+
+            <!-- Mysql Similarity Queries -->
+
+            <dbaction name="SelectSimilaritySetting">
+                <statement mode="query">SELECT value FROM SimilaritySettings WHERE keyword=:keyword;</statement>
+            </dbaction>
+
+            <dbaction name="SelectSimilarityLegacySetting">
+                <statement mode="query">SELECT value FROM SimilaritySettings WHERE keyword=:keyword;</statement>
+            </dbaction>
+
+            <dbaction name="ReplaceSimilaritySetting">
+                <statement mode="query">REPLACE INTO SimilaritySettings VALUES (:keyword, :value);</statement>
+            </dbaction>
+
+            <!-- Mysql Migration Statements -->
+
+            <!-- NOTE: Migrate_Cleanup_DB now it's done by the program except for cleanup prepare -->
+            <dbaction name="Migrate_Cleanup_Prepare" mode="transaction">
+                <statement mode="plain">SET FOREIGN_KEY_CHECKS=0;</statement>
+                <statement mode="plain">ALTER TABLE Albums DROP FOREIGN KEY Albums_Images;</statement>
+                <statement mode="plain">ALTER TABLE Albums DROP FOREIGN KEY Images_Albums;</statement>
+                <statement mode="plain">SET FOREIGN_KEY_CHECKS=1;</statement>
+            </dbaction>
+
+            <dbaction name="Migrate_Read_AlbumRoots"><statement mode="query">
+                SELECT id, label, status, type, identifier, specificPath FROM AlbumRoots;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_AlbumRoots" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO AlbumRoots (id, label, status, type, identifier, specificPath) VALUES (:id, :label, :status, :type, :identifier, :specificPath);
+            </statement></dbaction>
+
+            <!-- Note Albums with an icon set are setup after population of the Images table. -->
+            <dbaction name="Migrate_Read_Albums"><statement mode="query">
+                SELECT id, albumRoot, relativePath, date, caption, collection FROM Albums
+                WHERE  albumRoot IN (SELECT id FROM AlbumRoots);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_Albums" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO Albums (id, albumRoot, relativePath, date, caption, collection, icon) VALUES (:id, :albumRoot, :relativePath, :date, :caption, :collection, NULL);
+            </statement></dbaction>
+
+            <!-- Populate the Albums icon where set. -->
+            <dbaction name="Migrate_Read_AlbumsExtra"><statement mode="query">
+                SELECT id, icon FROM Albums WHERE icon IS NOT NULL AND icon != 0;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_AlbumsExtra" mode="transaction"><statement mode="query">
+                UPDATE IGNORE Albums set icon = :icon WHERE id = :id;
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_Images"><statement mode="query">
+                SELECT id, album, name, status, category, modificationDate, fileSize, uniqueHash, manualOrder FROM Images
+                WHERE  album IN (SELECT id FROM Albums);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_Images" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO Images (id, album, name, status, category, modificationDate, fileSize, uniqueHash, manualOrder) VALUES (:id, :album, :name, :status, :category, :modificationDate, :fileSize, :uniqueHash, :manualOrder);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageInformation"><statement mode="query">
+                SELECT imageid, rating, creationDate, digitizationDate, orientation, width, height, format, colorDepth, colorModel FROM ImageInformation
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageInformation" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO ImageInformation (imageid, rating, creationDate, digitizationDate, orientation, width, height, format, colorDepth, colorModel) VALUES (:imageid, :rating, :creationDate, :digitizationDate, :orientation, :width, :height, :format, :colorDepth, :colorModel);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageMetadata"><statement mode="query">
+                SELECT imageid, make, model, lens, aperture, focalLength, focalLength35, exposureTime, exposureProgram, exposureMode, sensitivity, flash, whiteBalance, whiteBalanceColorTemperature, meteringMode, subjectDistance, subjectDistanceCategory FROM ImageMetadata
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageMetadata" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO ImageMetadata (imageid, make, model, lens, aperture, focalLength, focalLength35, exposureTime, exposureProgram, exposureMode, sensitivity, flash, whiteBalance, whiteBalanceColorTemperature, meteringMode, subjectDistance, subjectDistanceCategory) VALUES (:imageid, :make, :model, :lens, :aperture, :focalLength, :focalLength35, :exposureTime, :exposureProgram, :exposureMode, :sensitivity, :flash, :whiteBalance, :whiteBalanceColorTemperature, :meteringMode, :subjectDistance, :subjectDistanceCategory);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_VideoMetadata"><statement mode="query">
+                SELECT imageid, aspectRatio, audioBitRate, audioChannelType, audioCompressor, duration, frameRate, videoCodec FROM VideoMetadata
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_VideoMetadata" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO VideoMetadata (imageid, aspectRatio, audioBitRate, audioChannelType, audioCompressor, duration, frameRate, videoCodec) VALUES (:imageid, :aspectRatio, :audioBitRate, :audioChannelType, :audioCompressor, :duration, :frameRate, :videoCodec);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageTagProperties"><statement mode="query">
+                SELECT imageid, tagid, property, value FROM ImageTagProperties
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageTagProperties"><statement mode="query">
+                INSERT IGNORE INTO ImageTagProperties (imageid, tagid, property, value) VALUES (:imageid, :tagid, :property, :value);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_TagProperties"><statement mode="query">
+                SELECT tagid, property, value FROM TagProperties
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_TagProperties"><statement mode="query">
+                INSERT IGNORE INTO TagProperties (tagid, property, value) VALUES (:tagid, :property, :value);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImagePositions"><statement mode="query">
+                SELECT imageid, latitude, latitudeNumber, longitude, longitudeNumber, altitude, orientation, tilt, roll, accuracy, description FROM ImagePositions
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImagePositions" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO ImagePositions (imageid, latitude, latitudeNumber, longitude, longitudeNumber, altitude, orientation, tilt, roll, accuracy, description) VALUES (:imageid, :latitude, :latitudeNumber, :longitude, :longitudeNumber, :altitude, :orientation, :tilt, :roll, :accuracy, :description);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageComments"><statement mode="query">
+                SELECT id, imageid, type, language, author, date, comment FROM ImageComments
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageComments" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO ImageComments (id, imageid, type, language, author, date, comment) VALUES (:id, :imageid, :type, :language, :author, :date, :comment);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageCopyright"><statement mode="query">
+                SELECT id, imageid, property, value, extraValue FROM ImageCopyright
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageCopyright" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO ImageCopyright (id, imageid, property, value, extraValue) VALUES (:id, :imageid, :property, :value, :extraValue);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_Tags"><statement mode="query">
+                SELECT id, pid, name, CASE WHEN icon = 0 THEN NULL ELSE icon END AS icon, iconkde FROM Tags WHERE id != 0;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_Tags" mode="transaction">
+                <statement mode="query">SELECT @myLeft := lft FROM Tags WHERE id = :pid;</statement>
+                <statement mode="query">SELECT @myLeft := IF (@myLeft is null, 0, @myLeft);</statement>
+                <statement mode="query">UPDATE Tags SET rgt = rgt + 2 WHERE rgt > @myLeft;</statement>
+                <statement mode="query">UPDATE Tags SET lft = lft + 2 WHERE lft > @myLeft;</statement>
+                <statement mode="query">REPLACE INTO Tags(id, pid, name, icon, iconkde, lft, rgt) VALUES(:id, :pid, :name, :icon, :iconkde, @myLeft + 1, @myLeft + 2);</statement>
+            </dbaction>
+
+            <dbaction name="Migrate_Read_ImageTags"><statement mode="query">
+                SELECT imageid, tagid FROM ImageTags
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageTags" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO ImageTags (imageid, tagid) VALUES (:imageid, :tagid);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageProperties"><statement mode="query">
+                SELECT imageid, property, value FROM ImageProperties
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageProperties" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO ImageProperties (imageid, property, value) VALUES (:imageid, :property, :value);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageHistory"><statement mode="query">
+                SELECT imageid, uuid, history FROM ImageHistory
+                WHERE  imageid IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageHistory"><statement mode="query">
+                INSERT IGNORE INTO ImageHistory (imageid, uuid, history) VALUES (:imageid, :uuid, :history);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_ImageRelations"><statement mode="query">
+                SELECT subject, object, type FROM ImageRelations
+                INNER  JOIN Images ON subject = Images.id WHERE object IN (SELECT id FROM Images);
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_ImageRelations"><statement mode="query">
+                INSERT IGNORE INTO ImageRelations (subject, object, type) VALUES (:subject, :object, :type);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_Searches"><statement mode="query">
+                SELECT id, type, name, query FROM Searches;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_Searches" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO Searches (id, type, name, query) VALUES (:id, :type, :name, :query);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_DownloadHistory"><statement mode="query">
+                SELECT id, identifier, filename, filesize, filedate FROM DownloadHistory;
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_DownloadHistory" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO DownloadHistory (id, identifier, filename, filesize, filedate) VALUES (:id, :identifier, :filename, :filesize, :filedate);
+            </statement></dbaction>
+
+            <dbaction name="Migrate_Read_Settings"><statement mode="query">
+                SELECT keyword, value FROM Settings
+                WHERE  keyword = 'Locale';
+            </statement></dbaction>
+            <dbaction name="Migrate_Write_Settings" mode="transaction"><statement mode="query">
+                INSERT IGNORE INTO Settings (keyword, value) VALUES (:keyword, :value);
+            </statement></dbaction>
+
+            <dbaction name="Delete_Thumbnail_ByPath" mode="query">
+                <statement mode="query">
+                    SELECT @thumbsId := thumbId FROM FilePaths WHERE path=:path;
+                </statement>
+                <statement mode="query">
+                    DELETE FROM UniqueHashes WHERE UniqueHashes.thumbId = @thumbsId;
+                </statement>
+                <statement mode="query">
+                    DELETE FROM FilePaths WHERE FilePaths.thumbId = @thumbsId;
+                </statement>
+                <statement mode="query">
+                    DELETE FROM Thumbnails WHERE id = @thumbsId;
+                </statement>
+            </dbaction>
+
+            <dbaction name="Delete_Thumbnail_ByUniqueHashId" mode="query">
+                <statement mode="query">
+                    SELECT @thumbsId := thumbId FROM UniqueHashes WHERE uniqueHash=:uniqueHash AND fileSize=:filesize;
+                </statement>
+                <statement mode="query">
+                    DELETE FROM UniqueHashes WHERE UniqueHashes.thumbId = @thumbsId;
+                </statement>
+                <statement mode="query">
+                    DELETE FROM FilePaths WHERE FilePaths.thumbId = @thumbsId;
+                </statement>
+                <statement mode="query">
+                    DELETE FROM Thumbnails WHERE id = @thumbsId;
+                </statement>
+            </dbaction>
+
+            <dbaction name="Delete_Thumbnail_ByCustomIdentifier" mode="query">
+                <statement mode="query">
+                    SELECT @thumbsId := thumbId FROM CustomIdentifiers WHERE identifier=:identifier;
+                </statement>
+                <statement mode="query">
+                    DELETE FROM UniqueHashes WHERE UniqueHashes.thumbId = @thumbsId;
+                </statement>
+                <statement mode="query">
+                    DELETE FROM FilePaths WHERE FilePaths.thumbId = @thumbsId;
+                </statement>
+                <statement mode="query">
+                    DELETE FROM CustomIdentifiers WHERE CustomIdentifiers.thumbId = @thumbsId;
+                </statement>
+                <statement mode="query">
+                    DELETE FROM Thumbnails WHERE id = @thumbsId;
+                </statement>
+            </dbaction>
+
+            <!-- Mysql Migration from Database Version 5 (0.10 - 1.4) to Version 6 (1.5-) -->
+
+            <dbaction name="UpdateSchemaFromV5ToV6" mode="transaction">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageHistory
+                    (imageid INTEGER PRIMARY KEY,
+                    uuid VARCHAR(128),
+                    history LONGTEXT CHARACTER SET utf8);
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageRelations
+                    (subject INTEGER,
+                    object INTEGER,
+                    type INTEGER,
+                    UNIQUE(subject, object, type));
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS TagProperties
+                    (tagid INTEGER,
+                    property TEXT CHARACTER SET utf8,
+                    value LONGTEXT CHARACTER SET utf8);
+                </statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS ImageTagProperties
+                    (imageid INTEGER,
+                    tagid INTEGER,
+                    property TEXT CHARACTER SET utf8,
+                    value LONGTEXT CHARACTER SET utf8);
+                </statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageTags','tag_id_index','imageid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('Images','image_name_index','name(255)');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageInformation','creationdate_index','creationDate');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageComments','comments_imageid_index','imageid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageCopyright','copyright_imageid_index','imageid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageHistory','uuid_index','uuid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageRelations','subject_relations_index','subject');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageRelations','object_relations_index','object');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('TagProperties','tagproperties_index','tagid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageTagProperties','imagetagproperties_index','imageid,tagid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageTagProperties','imagetagproperties_imageid_index','imageid');</statement>
+                <statement mode="plain">CALL create_index_if_not_exists('ImageTagProperties','imagetagproperties_tagid_index','tagid');</statement>
+                <statement mode="plain">ALTER TABLE Images CHANGE uniqueHash uniqueHash VARCHAR(128);</statement>
+                <statement mode="plain">DROP TRIGGER IF EXISTS delete_image;</statement>
+                <statement mode="plain">CREATE TRIGGER delete_image AFTER DELETE ON Images
+                    FOR EACH ROW BEGIN
+                        DELETE FROM ImageTags          WHERE imageid=OLD.id;
+                        DELETE From ImageHaarMatrix    WHERE imageid=OLD.id;
+                        DELETE From ImageInformation   WHERE imageid=OLD.id;
+                        DELETE From ImageMetadata      WHERE imageid=OLD.id;
+                        DELETE From VideoMetadata      WHERE imageid=OLD.id;
+                        DELETE From ImagePositions     WHERE imageid=OLD.id;
+                        DELETE From ImageComments      WHERE imageid=OLD.id;
+                        DELETE From ImageCopyright     WHERE imageid=OLD.id;
+                        DELETE From ImageProperties    WHERE imageid=OLD.id;
+                        DELETE From ImageHistory       WHERE imageid=OLD.id;
+                        DELETE FROM ImageRelations     WHERE subject=OLD.id OR object=OLD.id;
+                        DELETE FROM ImageTagProperties WHERE imageid=OLD.id;
+                        UPDATE Albums SET icon=null    WHERE icon=OLD.id;
+                        UPDATE Tags SET icon=null      WHERE icon=OLD.id;
+                    END;
+                </statement>
+                <statement mode="plain">DROP TRIGGER IF EXISTS delete_tag;</statement>
+                <statement mode="plain">CREATE TRIGGER delete_tag AFTER DELETE ON Tags
+                    FOR EACH ROW BEGIN
+                        DELETE FROM ImageTags          WHERE tagid=OLD.id;
+                        DELETE FROM TagProperties      WHERE tagid=OLD.id;
+                        DELETE FROM ImageTagProperties WHERE tagid=OLD.id;
+                    END;
+                </statement>
+            </dbaction>
+
+            <dbaction name="UpdateSchemaFromV6ToV7" mode="transaction">
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS VideoMetadata
+                    (imageid INTEGER PRIMARY KEY,
+                    aspectRatio TEXT,
+                    audioBitRate TEXT,
+                    audioChannelType TEXT,
+                    audioCompressor TEXT,
+                    duration TEXT,
+                    frameRate TEXT,
+                    exposureProgram INTEGER,
+                    videoCodec TEXT);
+                </statement>
+                <statement mode="plain">DROP TRIGGER IF EXISTS delete_image;</statement>
+                <statement mode="plain">CREATE TRIGGER delete_image AFTER DELETE ON Images
+                    FOR EACH ROW BEGIN
+                        DELETE FROM ImageTags          WHERE imageid=OLD.id;
+                        DELETE From ImageHaarMatrix    WHERE imageid=OLD.id;
+                        DELETE From ImageInformation   WHERE imageid=OLD.id;
+                        DELETE From ImageMetadata      WHERE imageid=OLD.id;
+                        DELETE From VideoMetadata      WHERE imageid=OLD.id;
+                        DELETE From ImagePositions     WHERE imageid=OLD.id;
+                        DELETE From ImageComments      WHERE imageid=OLD.id;
+                        DELETE From ImageCopyright     WHERE imageid=OLD.id;
+                        DELETE From ImageProperties    WHERE imageid=OLD.id;
+                        DELETE From ImageHistory       WHERE imageid=OLD.id;
+                        DELETE FROM ImageRelations     WHERE subject=OLD.id OR object=OLD.id;
+                        DELETE FROM ImageTagProperties WHERE imageid=OLD.id;
+                        UPDATE Albums SET icon=null    WHERE icon=OLD.id;
+                        UPDATE Tags SET icon=null      WHERE icon=OLD.id;
+                    END;
+                </statement>
+            </dbaction>
+
+            <dbaction name="UpdateSchemaFromV7ToV9" mode="transaction">
+                <statement mode="plain">
+                    DROP PROCEDURE IF EXISTS drop_foreign_key;
+                </statement>
+                <statement mode="plain">
+                    CREATE PROCEDURE drop_foreign_key(IN tableName VARCHAR(64), IN constraintName VARCHAR(64))
+                    BEGIN
+                        IF EXISTS(
+                            SELECT * FROM information_schema.table_constraints
+                            WHERE
+                                table_schema    = DATABASE()                           AND
+                                table_name      = CONVERT(tableName USING latin1)      AND
+                                constraint_name = CONVERT(constraintName USING latin1) AND
+                                constraint_type = 'FOREIGN KEY')
+                        THEN
+                            SET @query = CONCAT(
+                                CONVERT('ALTER TABLE ' USING latin1),
+                                CONVERT(tableName USING latin1),
+                                CONVERT(' DROP FOREIGN KEY ' USING latin1),
+                                CONVERT(constraintName USING latin1),
+                                CONVERT(';'USING latin1)
+                            );
+                            PREPARE stmt FROM @query;
+                            EXECUTE stmt;
+                            DEALLOCATE PREPARE stmt;
+                        END IF;
+                    END;
+                </statement>
+                <statement mode="plain">
+                    DROP PROCEDURE IF EXISTS drop_index_if_exists;
+                </statement>
+                <statement mode="plain">
+                    CREATE PROCEDURE drop_index_if_exists(in tableName varchar(64), in indexName varchar(64))
+                    BEGIN
+                        IF((SELECT COUNT(*) AS index_exists FROM information_schema.statistics
+                            WHERE TABLE_SCHEMA = DATABASE() and table_name = CONVERT(tableName USING latin1) AND index_name = CONVERT(indexName USING latin1)) > 0)
+                        THEN
+                            SET @query = CONCAT(
+                                CONVERT('DROP INDEX ' USING latin1),
+                                CONVERT(indexName USING latin1),
+                                CONVERT(' ON ' USING latin1),
+                                CONVERT(tableName USING latin1)
+                            );
+                            PREPARE stmt FROM @query;
+                            EXECUTE stmt;
+                        END IF;
+                    END;
+                </statement>
+                <statement mode="plain">DROP TRIGGER IF EXISTS delete_image;</statement>
+                <statement mode="plain">DROP TRIGGER IF EXISTS delete_tag;</statement>
+                <statement mode="plain">DROP TRIGGER IF EXISTS move_tagstree;</statement>
+                <statement mode="plain">CALL drop_index_if_exists('AlbumRoots', 'identifier');</statement>
+                <statement mode="plain">CALL drop_foreign_key('Albums', 'Albums_AlbumRoots');</statement>
+                <statement mode="plain">CALL drop_index_if_exists('Albums', 'albumRoot');</statement>
+                <statement mode="plain">CALL drop_foreign_key('Images', 'Images_Albums');</statement>
+                <statement mode="plain">CALL drop_index_if_exists('Images', 'album');</statement>
+                <statement mode="plain">CALL drop_index_if_exists('Images', 'album_2');</statement>
+                <statement mode="plain">CALL drop_index_if_exists('Images', 'album_3');</statement>
+                <statement mode="plain">CALL drop_foreign_key('Albums', 'Albums_Images');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageHaarMatrix', 'ImageHaarMatrix_Images');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageInformation', 'ImageInformation_Images');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageMetadata', 'ImageMetadata_Images');</statement>
+                <statement mode="plain">CALL drop_foreign_key('VideoMetadata', 'VideoMetadata_Images');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImagePositions', 'ImagePositions_Images');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageComments', 'ImageComments_Images');</statement>
+                <statement mode="plain">CALL drop_index_if_exists('ImageComments', 'imageid');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageCopyright', 'ImageCopyright_Images');</statement>
+                <statement mode="plain">CALL drop_index_if_exists('ImageCopyright', 'imageid');</statement>
+                <statement mode="plain">CALL drop_foreign_key('Tags', 'Tags_Images');</statement>
+                <statement mode="plain">CALL drop_index_if_exists('Tags', 'pid');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageTags', 'ImageTags_Images');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageTags', 'ImageTags_Tags');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageProperties', 'ImageProperties_Images');</statement>
+                <statement mode="plain">CALL drop_index_if_exists('ImageProperties', 'imageid');</statement>
+                <statement mode="plain">CALL drop_index_if_exists('DownloadHistory', 'identifier');</statement>
+                <statement mode="plain">CALL drop_index_if_exists('Settings', 'keyword');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageHistory', 'ImageHistory_Images');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageRelations', 'ImageRelations_ImagesS');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageRelations', 'ImageRelations_ImagesO');</statement>
+                <statement mode="plain">CALL drop_foreign_key('TagProperties', 'TagProperties_Tags');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageTagProperties', 'ImageTagProperties_Images');</statement>
+                <statement mode="plain">CALL drop_foreign_key('ImageTagProperties', 'ImageTagProperties_Tags');</statement>
+
+                <statement mode="plain">ALTER TABLE AlbumRoots MODIFY COLUMN label LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE AlbumRoots MODIFY COLUMN identifier LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE AlbumRoots MODIFY COLUMN specificPath LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE Albums MODIFY COLUMN relativePath LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;</statement>
+                <statement mode="plain">ALTER TABLE Albums MODIFY COLUMN caption LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE Albums MODIFY COLUMN collection LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE Images MODIFY COLUMN name LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;</statement>
+                <statement mode="plain">ALTER TABLE Images MODIFY COLUMN fileSize BIGINT;</statement>
+                <statement mode="plain">ALTER TABLE ImageHaarMatrix MODIFY COLUMN uniqueHash LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageInformation MODIFY COLUMN format LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageMetadata MODIFY COLUMN make LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageMetadata MODIFY COLUMN model LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageMetadata MODIFY COLUMN lens LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImagePositions MODIFY COLUMN latitude LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImagePositions MODIFY COLUMN longitude LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImagePositions MODIFY COLUMN description LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageComments MODIFY COLUMN language VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageComments MODIFY COLUMN author LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageComments MODIFY COLUMN comment LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageCopyright MODIFY COLUMN property LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageCopyright MODIFY COLUMN value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageCopyright MODIFY COLUMN extraValue LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE Tags MODIFY COLUMN name LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;</statement>
+                <statement mode="plain">ALTER TABLE Tags MODIFY COLUMN iconkde LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageProperties MODIFY COLUMN property LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;</statement>
+                <statement mode="plain">ALTER TABLE ImageProperties MODIFY COLUMN value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;</statement>
+                <statement mode="plain">ALTER TABLE Searches MODIFY COLUMN name LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;</statement>
+                <statement mode="plain">ALTER TABLE Searches MODIFY COLUMN query LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;</statement>
+                <statement mode="plain">ALTER TABLE DownloadHistory MODIFY COLUMN identifier LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE DownloadHistory MODIFY COLUMN filename LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE DownloadHistory MODIFY COLUMN filesize BIGINT;</statement>
+                <statement mode="plain">ALTER TABLE Settings MODIFY COLUMN keyword LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;</statement>
+                <statement mode="plain">ALTER TABLE Settings MODIFY COLUMN value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageHistory MODIFY COLUMN history LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE TagProperties MODIFY COLUMN property TEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE TagProperties MODIFY COLUMN value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageTagProperties MODIFY COLUMN property TEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE ImageTagProperties MODIFY COLUMN value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+
+                <statement mode="plain">DROP TABLE IF EXISTS ImageTagProperties_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS TagProperties_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS ImageRelations_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS ImageHistory_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS Settings_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS DownloadHistory_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS ImageProperties_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS ImageTags_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS Tags_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS ImageCopyright_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS ImageComments_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS ImagePositions_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS VideoMetadata_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS ImageMetadata_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS ImageInformation_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS ImageHaarMatrix_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS Images_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS Albums_old;</statement>
+                <statement mode="plain">DROP TABLE IF EXISTS AlbumRoots_old;</statement>
+
+                <statement mode="plain">RENAME TABLE AlbumRoots TO AlbumRoots_old;</statement>
+                <statement mode="plain">CREATE TABLE AlbumRoots LIKE AlbumRoots_old;</statement>
+                <statement mode="plain">ALTER TABLE AlbumRoots
+                    ADD UNIQUE (identifier(127), specificPath(128)),
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO AlbumRoots SELECT * FROM AlbumRoots_old;</statement>
+
+                <statement mode="plain">RENAME TABLE Albums TO Albums_old;</statement>
+                <statement mode="plain">CREATE TABLE Albums LIKE Albums_old;</statement>
+                <statement mode="plain">ALTER TABLE Albums
+                    ADD CONSTRAINT Albums_AlbumRoots FOREIGN KEY (albumRoot) REFERENCES AlbumRoots (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ADD UNIQUE (albumRoot, relativePath(255)),
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO Albums SELECT * FROM Albums_old;</statement>
+                <statement mode="plain">UPDATE Albums SET icon = NULL WHERE icon = 0;</statement>
+
+                <statement mode="plain">RENAME TABLE Images TO Images_old;</statement>
+                <statement mode="plain">CREATE TABLE Images LIKE Images_old;</statement>
+                <statement mode="plain">ALTER TABLE Images
+                    ADD CONSTRAINT Images_Albums FOREIGN KEY (album) REFERENCES Albums (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ADD UNIQUE (album, name(255)),
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO Images SELECT * FROM Images_old;</statement>
+
+                <statement mode="plain">ALTER TABLE Albums
+                    ADD CONSTRAINT Albums_Images FOREIGN KEY (icon) REFERENCES Images (id) ON DELETE SET NULL ON UPDATE CASCADE;
+                </statement>
+
+                <statement mode="plain">RENAME TABLE ImageHaarMatrix TO ImageHaarMatrix_old;</statement>
+                <statement mode="plain">CREATE TABLE ImageHaarMatrix LIKE ImageHaarMatrix_old;</statement>
+                <statement mode="plain">ALTER TABLE ImageHaarMatrix
+                    ADD CONSTRAINT ImageHaarMatrix_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImageHaarMatrix SELECT * FROM ImageHaarMatrix_old;</statement>
+
+                <statement mode="plain">RENAME TABLE ImageInformation TO ImageInformation_old;</statement>
+                <statement mode="plain">CREATE TABLE ImageInformation LIKE ImageInformation_old;</statement>
+                <statement mode="plain">ALTER TABLE ImageInformation
+                    ADD CONSTRAINT ImageInformation_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImageInformation SELECT * FROM ImageInformation_old;</statement>
+
+                <statement mode="plain">RENAME TABLE ImageMetadata TO ImageMetadata_old;</statement>
+                <statement mode="plain">CREATE TABLE ImageMetadata LIKE ImageMetadata_old;</statement>
+                <statement mode="plain">ALTER TABLE ImageMetadata
+                    ADD CONSTRAINT ImageMetadata_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImageMetadata SELECT * FROM ImageMetadata_old;</statement>
+
+                <statement mode="plain">RENAME TABLE VideoMetadata TO VideoMetadata_old;</statement>
+                <statement mode="plain">CREATE TABLE VideoMetadata LIKE VideoMetadata_old;</statement>
+                <statement mode="plain">ALTER TABLE VideoMetadata
+                    ADD CONSTRAINT VideoMetadata_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO VideoMetadata SELECT * FROM VideoMetadata_old;</statement>
+
+                <statement mode="plain">RENAME TABLE ImagePositions TO ImagePositions_old;</statement>
+                <statement mode="plain">CREATE TABLE ImagePositions LIKE ImagePositions_old;</statement>
+                <statement mode="plain">ALTER TABLE ImagePositions
+                    ADD CONSTRAINT ImagePositions_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImagePositions SELECT * FROM ImagePositions_old;</statement>
+
+                <statement mode="plain">RENAME TABLE ImageComments TO ImageComments_old;</statement>
+                <statement mode="plain">CREATE TABLE ImageComments LIKE ImageComments_old;</statement>
+                <statement mode="plain">ALTER TABLE ImageComments
+                    ADD CONSTRAINT ImageComments_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ADD UNIQUE(imageid, type, language, author(202)),
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImageComments SELECT * FROM ImageComments_old;</statement>
+
+                <statement mode="plain">RENAME TABLE ImageCopyright TO ImageCopyright_old;</statement>
+                <statement mode="plain">CREATE TABLE ImageCopyright LIKE ImageCopyright_old;</statement>
+                <statement mode="plain">ALTER TABLE ImageCopyright
+                    ADD CONSTRAINT ImageCopyright_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ADD UNIQUE(imageid, property(110), value(111), extraValue(111)),
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImageCopyright SELECT * FROM ImageCopyright_old;</statement>
+
+                <statement mode="plain">SET FOREIGN_KEY_CHECKS=0;</statement>
+                <statement mode="plain">RENAME TABLE Tags TO Tags_old;</statement>
+                <statement mode="plain">CREATE TABLE Tags LIKE Tags_old;</statement>
+                <statement mode="plain">ALTER TABLE Tags
+                    ADD CONSTRAINT Tags_Images FOREIGN KEY (icon) REFERENCES Images (id) ON DELETE SET NULL ON UPDATE CASCADE,
+                    ADD UNIQUE(pid, name(100)),
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">REPLACE INTO Tags SELECT * FROM Tags_old;</statement>
+                <statement mode="plain">SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO';</statement>
+                <statement mode="plain">REPLACE INTO Tags
+                    (id, pid, name, icon, iconkde, lft, rgt) VALUES (0, -1, '_Digikam_root_tag_', NULL, NULL,
+                    (SELECT MIN(tl.lft) FROM Tags AS tl),
+                    (SELECT MAX(tr.rgt) FROM Tags AS tr));
+                </statement>
+                <statement mode="plain">SET SQL_MODE=@OLD_SQL_MODE;</statement>
+                <statement mode="plain">UPDATE Tags SET icon = NULL WHERE icon = 0;</statement>
+                <statement mode="plain">SET FOREIGN_KEY_CHECKS=1;</statement>
+
+                <statement mode="plain">RENAME TABLE ImageTags TO ImageTags_old;</statement>
+                <statement mode="plain">CREATE TABLE ImageTags LIKE ImageTags_old;</statement>
+                <statement mode="plain">ALTER TABLE ImageTags
+                    ADD CONSTRAINT ImageTags_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ADD CONSTRAINT ImageTags_Tags FOREIGN KEY (tagid) REFERENCES Tags (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImageTags SELECT * FROM ImageTags_old;</statement>
+
+                <statement mode="plain">RENAME TABLE ImageProperties TO ImageProperties_old;</statement>
+                <statement mode="plain">CREATE TABLE ImageProperties LIKE ImageProperties_old;</statement>
+                <statement mode="plain">ALTER TABLE ImageProperties
+                    ADD CONSTRAINT ImageProperties_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ADD UNIQUE (imageid, property(255)),
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImageProperties SELECT * FROM ImageProperties_old;</statement>
+
+                <statement mode="plain">ALTER TABLE Searches ENGINE InnoDB;</statement>
+
+                <statement mode="plain">RENAME TABLE DownloadHistory TO DownloadHistory_old;</statement>
+                <statement mode="plain">CREATE TABLE DownloadHistory LIKE DownloadHistory_old;</statement>
+                <statement mode="plain">ALTER TABLE DownloadHistory
+                    ADD UNIQUE(identifier(164), filename(165), filesize, filedate),
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO DownloadHistory SELECT * FROM DownloadHistory_old;</statement>
+
+                <statement mode="plain">RENAME TABLE Settings TO Settings_old;</statement>
+                <statement mode="plain">CREATE TABLE Settings LIKE Settings_old;</statement>
+                <statement mode="plain">ALTER TABLE Settings
+                    ADD UNIQUE(keyword(255)),
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO Settings SELECT * FROM Settings_old;</statement>
+
+                <statement mode="plain">RENAME TABLE ImageHistory TO ImageHistory_old;</statement>
+                <statement mode="plain">CREATE TABLE ImageHistory LIKE ImageHistory_old;</statement>
+                <statement mode="plain">ALTER TABLE ImageHistory
+                    ADD CONSTRAINT ImageHistory_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImageHistory SELECT * FROM ImageHistory_old;</statement>
+
+                <statement mode="plain">RENAME TABLE ImageRelations TO ImageRelations_old;</statement>
+                <statement mode="plain">CREATE TABLE ImageRelations LIKE ImageRelations_old;</statement>
+                <statement mode="plain">ALTER TABLE ImageRelations
+                    ADD CONSTRAINT ImageRelations_ImagesS FOREIGN KEY (subject) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ADD CONSTRAINT ImageRelations_ImagesO FOREIGN KEY (object) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImageRelations SELECT * FROM ImageRelations_old;</statement>
+
+                <statement mode="plain">RENAME TABLE TagProperties TO TagProperties_old;</statement>
+                <statement mode="plain">CREATE TABLE TagProperties LIKE TagProperties_old;</statement>
+                <statement mode="plain">ALTER TABLE TagProperties
+                    ADD CONSTRAINT TagProperties_Tags FOREIGN KEY (tagid) REFERENCES Tags (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO TagProperties SELECT * FROM TagProperties_old;</statement>
+
+                <statement mode="plain">RENAME TABLE ImageTagProperties TO ImageTagProperties_old;</statement>
+                <statement mode="plain">CREATE TABLE ImageTagProperties LIKE ImageTagProperties_old;</statement>
+                <statement mode="plain">ALTER TABLE ImageTagProperties
+                    ADD CONSTRAINT ImageTagProperties_Images FOREIGN KEY (imageid) REFERENCES Images (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ADD CONSTRAINT ImageTagProperties_Tags FOREIGN KEY (tagid) REFERENCES Tags (id) ON DELETE CASCADE ON UPDATE CASCADE,
+                    ENGINE InnoDB;
+                </statement>
+                <statement mode="plain">INSERT IGNORE INTO ImageTagProperties SELECT * FROM ImageTagProperties_old;</statement>
+
+                <statement mode="plain">DROP TABLE ImageTagProperties_old;</statement>
+                <statement mode="plain">DROP TABLE TagProperties_old;</statement>
+                <statement mode="plain">DROP TABLE ImageRelations_old;</statement>
+                <statement mode="plain">DROP TABLE ImageHistory_old;</statement>
+                <statement mode="plain">DROP TABLE Settings_old;</statement>
+                <statement mode="plain">DROP TABLE DownloadHistory_old;</statement>
+                <statement mode="plain">DROP TABLE ImageProperties_old;</statement>
+                <statement mode="plain">DROP TABLE ImageTags_old;</statement>
+                <statement mode="plain">DROP TABLE Tags_old;</statement>
+                <statement mode="plain">DROP TABLE ImageCopyright_old;</statement>
+                <statement mode="plain">DROP TABLE ImageComments_old;</statement>
+                <statement mode="plain">DROP TABLE ImagePositions_old;</statement>
+                <statement mode="plain">DROP TABLE VideoMetadata_old;</statement>
+                <statement mode="plain">DROP TABLE ImageMetadata_old;</statement>
+                <statement mode="plain">DROP TABLE ImageInformation_old;</statement>
+                <statement mode="plain">DROP TABLE ImageHaarMatrix_old;</statement>
+                <statement mode="plain">DROP TABLE Images_old;</statement>
+                <statement mode="plain">DROP TABLE Albums_old;</statement>
+                <statement mode="plain">DROP TABLE AlbumRoots_old;</statement>
+            </dbaction>
+
+            <dbaction name="UpdateSchemaFromV9ToV10" mode="transaction">
+                <statement mode="plain">DROP TABLE IF EXISTS ImageHaarMatrix;</statement>
+                <statement mode="plain">ALTER TABLE Images ADD manualOrder INTEGER;</statement>
+            </dbaction>
+
+            <dbaction name="UpdateThumbnailsDBSchemaFromV1ToV2" mode="transaction">
+                <statement mode="plain">ALTER TABLE UniqueHashes CHANGE uniqueHash uniqueHash VARCHAR(128);</statement>
+                <statement mode="plain">CREATE TABLE IF NOT EXISTS CustomIdentifiers
+                    (identifier LONGTEXT CHARACTER SET utf8,
+                    thumbId INTEGER,
+                    UNIQUE(identifier(333)));
+                </statement>
+                <statement mode="plain">CALL create_index_if_not_exists('CustomIdentifiers','id_customIdentifiers','thumbId');</statement>
+            </dbaction>
+
+            <dbaction name="UpdateThumbnailsDBSchemaFromV2ToV3" mode="transaction">
+                <statement mode="plain">ALTER TABLE Settings RENAME ThumbSettings;</statement>
+                <statement mode="plain">ALTER TABLE ThumbSettings
+                    MODIFY COLUMN keyword VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci,
+                    MODIFY COLUMN value LONGTEXT CHARACTER SET utf8 COLLATE utf8_general_ci;
+                </statement>
+                <statement mode="plain">ALTER TABLE ThumbSettings ENGINE InnoDB;</statement>
+                <statement mode="plain">ALTER TABLE Thumbnails ENGINE InnoDB;</statement>
+                <statement mode="plain">ALTER TABLE UniqueHashes ENGINE InnoDB;</statement>
+                <statement mode="plain">ALTER TABLE FilePaths MODIFY COLUMN path VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE FilePaths ENGINE InnoDB;</statement>
+                <statement mode="plain">ALTER TABLE CustomIdentifiers MODIFY COLUMN identifier VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_general_ci;</statement>
+                <statement mode="plain">ALTER TABLE CustomIdentifiers ENGINE InnoDB;</statement>
+                <statement mode="plain">ALTER TABLE UniqueHashes
+                    ADD CONSTRAINT UniqueHashes_Thumbnails FOREIGN KEY (thumbId) REFERENCES Thumbnails (id) ON DELETE CASCADE ON UPDATE CASCADE;
+                </statement>
+                <statement mode="plain">ALTER TABLE FilePaths
+                    ADD CONSTRAINT FilePaths_Thumbnails FOREIGN KEY (thumbId) REFERENCES Thumbnails (id) ON DELETE CASCADE ON UPDATE CASCADE;
+                </statement>
+                <statement mode="plain">ALTER TABLE CustomIdentifiers
+                    ADD CONSTRAINT CustomIdentifiers_Thumbnails FOREIGN KEY (thumbId) REFERENCES Thumbnails (id) ON DELETE CASCADE ON UPDATE CASCADE;
+                </statement>
+            </dbaction>
+
+            <!-- statements for shrinking the databases -->
+
+            <dbaction name="vacuumCoreDB">
+                <statement mode="query">OPTIMIZE TABLE Albums, Images, ImageInformation, ImageMetadata, VideoMetadata, ImagePositions, ImageComments, ImageCopyright, ImageProperties, ImageHistory, ImageRelations, Tags, ImageTags, ImageTagProperties;</statement>
+            </dbaction>
+
+            <dbaction name="vacuumThumbnailsDB">
+                <statement mode="query">OPTIMIZE TABLE Thumbnails, UniqueHashes, FilePaths, CustomIdentifiers;</statement>
+            </dbaction>
+
+            <dbaction name="vacuumRecognitionDB">
+                <statement mode="query">OPTIMIZE TABLE Identities, IdentityAttributes;</statement>
+            </dbaction>
+
+            <dbaction name="vacuumSimilarityDB">
+                <statement mode="query">OPTIMIZE TABLE ImageSimilarity, ImageHaarMatrix, SimilaritySettings;</statement>
+            </dbaction>
+
+            <dbaction name="checkCoreDbIntegrity"> 
+                <statement mode="unprepared">CHECK TABLE Albums, Images, ImageInformation, ImageMetadata, VideoMetadata, ImagePositions, ImageComments, ImageCopyright, ImageProperties, ImageHistory, ImageRelations, Tags, ImageTags, ImageTagProperties;</statement>
+            </dbaction>
+
+            <dbaction name="checkThumbnailsDbIntegrity">
+                <statement mode="unprepared">CHECK TABLE Thumbnails, UniqueHashes, FilePaths, CustomIdentifiers;</statement>
+            </dbaction>
+
+            <dbaction name="checkRecognitionDbIntegrity">
+                <statement mode="unprepared">CHECK TABLE Identities, IdentityAttributes;</statement>
+            </dbaction>
+
+            <dbaction name="checkSimilarityDbIntegrity">
+                <statement mode="unprepared">CHECK TABLE ImageSimilarity, ImageHaarMatrix, SimilaritySettings;</statement>
+            </dbaction>
+
+        </dbactions>
+
+    </database>
+
+</databaseconfig>

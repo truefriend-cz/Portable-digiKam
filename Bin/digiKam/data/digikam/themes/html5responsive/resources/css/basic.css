@@ -1,0 +1,228 @@
+@import url("fundament.css");
+
+html {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	margin: 0;
+	border: 0;
+	background-color: #888;
+	color: white;
+	padding: 0;
+	font-family: sans-serif;
+}
+
+body > header {
+	margin: 0;
+	background-color: white;
+	color: black;
+}
+
+body > header h1 {
+	margin: 0;
+	padding: 0;
+	background-color: white;
+	text-align: center;
+}
+
+body nav {
+	background-color: white;
+	padding: 0.2em;
+	color: black;
+	text-align: center;
+}
+
+body nav.topOfPage p.upLink {
+	margin-top: 0.3em;
+	margin-bottom: 0.6em;
+}
+
+a {
+	color: DimGray;
+}
+
+a:visited {
+	color: gray;
+}
+
+div.pagination {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: center;
+	margin: 0;
+}
+
+div.pagination p {
+	margin: 0 0.5em;
+}
+
+div.pagination ol {
+	margin: 0.2em;
+	display: flex;
+	flex-wrap: wrap;
+}
+
+div.pagination ol li {
+	display: inline-block;
+}
+
+body > footer {
+	background-color: white;
+	padding: 0.3em;
+	color: black;
+	text-align: right;
+}
+
+body.collectionPage figcaption {
+	display: none;
+}
+
+ul.collectionList {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+ul.collectionList li {
+	display: inline-block;
+	margin: 1em 0.2em;
+	background-color: white;
+	padding: 0.2em;
+	color: black;
+}
+
+ul.collectionList li + li {
+	margin-top: 1em;
+}
+
+ul.collectionList figure {
+	margin: 0.75em;
+}
+
+ul.collectionList img {
+	max-width: 100%;
+	height: auto;
+}
+
+ul.collectionList figcaption {
+	text-align: center;
+}
+
+figure > figcaption {
+	margin: 0.1em;
+	border: 1px solid gray;
+	padding: 0.2em;
+}
+
+ol.imageList {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+ol.imageList li {
+	display: inline-block;
+	margin: 0.5em;
+	border: 1px solid black;
+	background: white;
+	padding: 1em;
+}
+
+ol.imageList figure {
+	display: inline-block;
+	margin: 0;
+}
+
+ol.imageList figure a {
+	display: block;
+}
+
+ol.imageList img {
+	display: block;
+	max-width: 100%;
+	height: auto;
+}
+
+figure#image {
+	margin: 1em auto;
+	text-align: center;
+}
+
+figure#image a {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	max-width: 100%;
+}
+
+figure#image img {
+	max-width: calc(100% - 2px - 2em);
+	height: auto;
+	display: block;
+	margin: 1em auto;
+	border: 1px solid black;
+	background-color: white;
+	padding: 1em;
+}
+
+figure#image figcaption {
+	max-width: 60em;
+	margin: 1em auto;
+	border: 1px solid gray;
+	background-color: white;
+	color: black;
+	padding: 0;
+	text-align: center;
+}
+
+figure#image figcaption p.imageDescription {
+	margin: 0;
+	border-bottom: 1px solid gray;
+	padding: 0.3em;
+}
+
+figure#image table.exifData {
+	margin: 1em auto;
+	border: 5px inset DimGray;
+	background-color: white;
+	color: black;
+	padding: 0.2em 0.1em;
+	border-spacing: 0.5em 0.1em;
+}
+
+@media screen {
+	/* Caption and table header are not really needed for screen display,
+	 as they're mostly intended to add context for speech browsers. */
+	figure#image table.exifData caption {
+		display: none;
+	}
+
+	figure#image table.exifData th[scope=col] {
+		display: none;
+	}
+}
+
+figure#image table.exifData th {
+	border: 1px solid DimGray;
+	padding: 0.2em;
+}
+
+figure#image table.exifData th[scope=row] {
+	text-align: right;
+}
+
+figure#image table.exifData td {
+	border: 1px solid gray;
+	padding: 0.2em;
+}
+
+figure#image figcaption p.originalImageLink {
+	margin: 0;
+	border-top: 1px solid gray;
+	padding: 0.3em;
+}

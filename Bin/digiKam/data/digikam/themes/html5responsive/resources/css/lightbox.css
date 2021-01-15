@@ -1,0 +1,319 @@
+@import url("fundament.css");
+
+html {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	margin: 0;
+	border-style: solid;
+	border-width: 65px 47px 47px 51px;
+	border-image: url("../images/Lightbox/LightBox_topless.jpg") stretch 65 47 47 51;
+	background-color: #e6e6e6;
+	color: white;
+	padding: 0;
+}
+
+body > header {
+	display: block;
+	margin: 0 0;
+	margin-left: -51px;
+	margin-right: -47px;
+	border-style: solid;
+	border-width: 39px 46px 11px 51px;
+	border-image: url("../images/Lightbox/Lightbox_top.jpg") stretch 39 46 11 51;
+	text-align: center;
+}
+
+body.collectionListPage > header > h1, body > header > div#pageTitleAndPagination {
+	display: inline-block;
+	margin: 0 auto;
+	opacity: 0.9;
+	text-overflow: clip;
+}
+
+body.collectionListPage > header > h1, body > header > div#pageTitleAndPagination, figure > figcaption {
+	border-style: solid;
+	border-width: 0.4rem 0.733rem 1.833rem 0.4rem;
+	border-image: url("../images/Lightbox/SafetyFilm-strip.jpg") repeat 12 22 55 12;
+	background-color: #752f30;
+	color: #dd852e;
+	text-shadow: 0 0 2px;
+	text-align: center;
+}
+
+figure#image figcaption {
+	max-width: 50em;
+	margin: 1em auto;
+}
+
+body > header h1, body > header a, body > header a:visited {
+	color: #ffba62;
+}
+
+body > header h1 {
+	margin: 0 auto;
+}
+
+nav p.upLink {
+	margin-top: 0.1em;
+	margin-bottom: 0.3em;
+}
+
+nav.topOfPage p.upLink + div.pagination {
+	margin-top: 0.1em;
+}
+
+body > header div.pagination {
+	margin: 0 auto;
+	padding: 0;
+	text-align: center;
+}
+
+div.pagination {
+	margin: 0.2em 0;
+}
+
+div.pagination p {
+	display: inline-block;
+	margin-top: 0.1em;
+	margin-bottom: 0.1em;
+}
+
+div.pagination p.currentOfTotal {
+	margin-left: 2em;
+	margin-right: 2em;
+}
+
+div.pagination ol {
+	display: inline-block;
+	margin: 0.2em;
+}
+
+div.pagination ol li {
+	display: inline-block;
+}
+
+nav li.pageNumber {
+	min-width: 2em;
+}
+
+nav li.pageNumber.current {
+	border-width: 2px;
+	border-style: solid;
+	border-radius: 50%;
+}
+
+body > footer {
+	border-style: solid;
+	border-width: 1.666em 0.567em 1.9em 0.767em;
+	border-image: url("../images/Lightbox/Monochrome-strip.jpg") round 50 17 57 23;
+	background-color: #dadce5;
+	padding: 0.3em;
+	color: #4e4c50;
+	text-align: right;
+	text-shadow: 0 0 4px;
+}
+
+body > footer nav {
+	text-align: center;
+}
+
+body > footer a {
+	color: #383739;
+}
+
+ul.collectionList, ol.imageList {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-evenly;
+	align-items: center;
+	align-content: space-around;
+}
+
+ul.collectionList li, ol.imageList li {
+	margin: 1em;
+	border: 1px solid transparent;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+ul.collectionList li a, ol.imageList li a {
+	display: inline-block;
+	margin: 0;
+	background: transparent;
+	padding: 0;
+}
+
+li.landscape a.thumbnailLink {
+	border-style: solid;
+	border-width: 5em 2.835em 4.72em 2.8em;
+	border-image: url("../images/Lightbox/SlideFrame_landscape.png") stretch 127 72 120 71;
+}
+
+li.portrait a.thumbnailLink {
+	border-style: solid;
+	border-width: 2.835em 4.72em 2.8em 5em;
+	border-image: url("../images/Lightbox/SlideFrame_portrait.png") stretch 72 120 71 127;
+}
+
+li.square a.thumbnailLink {
+	border-style: solid;
+	border-width: 2.756em 2.835em 2.874em 2.796em;
+	border-image: url("../images/Lightbox/SlideFrame_square.png") stretch 70 72 73 71;
+}
+
+ul.collectionList li a img, ol.imageList li a img {
+	display: block;
+}
+
+ol.imageList figcaption {
+	display: none;
+}
+
+ol.imageList li {
+	transition: transform 0.1s;
+}
+ol.imageList li.mod2val0.mod5val0:hover, ol.imageList li.mod2val1.mod5val1:hover, ol.imageList li.mod2val0.mod5val2:hover, ol.imageList li.mod2val1.mod5val3:hover, ol.imageList li.mod2val0.mod5val4:hover, ol.imageList li.mod2val1.mod5val0:hover, ol.imageList li.mod2val0.mod5val1:hover, ol.imageList li.mod2val1.mod5val2:hover, ol.imageList li.mod2val0.mod5val3:hover, ol.imageList li.mod2val1.mod5val4:hover {
+	transform: rotate(0);
+}
+/* The rotate3d calls should really be using (0, 0, 1, x) but using zeroes
+causes border-image joins to be rendered as see-through tears, which spoils the
+look. Using non-zero values seems to force the renderer to use smoothing and
+this fixes the problem. */
+ol.imageList li.mod2val0.mod5val0 {
+	transform: rotate3d(0.1, 0.1, 1, 10deg);
+}
+ol.imageList li.mod2val1.mod5val1 {
+	transform: rotate3d(0.1, 0.1, 1, 4deg);
+}
+ol.imageList li.mod2val0.mod5val2 {
+	transform: rotate3d(0.1, 0.1, 1, -6deg);
+}
+ol.imageList li.mod2val1.mod5val3 {
+	transform: rotate3d(0.1, 0.1, 1, -10deg);
+}
+ol.imageList li.mod2val0.mod5val4 {
+	transform: rotate3d(0.1, 0.1, 1, -5deg);
+}
+ol.imageList li.mod2val1.mod5val0 {
+	transform: rotate3d(0.1, 0.1, 1, 4deg);
+}
+ol.imageList li.mod2val0.mod5val1 {
+	transform: rotate3d(0.1, 0.1, 1, 7deg);
+}
+ol.imageList li.mod2val1.mod5val2 {
+	transform: rotate3d(0.1, 0.1, 1, -8deg);
+}
+ol.imageList li.mod2val0.mod5val3 {
+	transform: rotate3d(0.1, 0.1, 1, 4deg);
+}
+ol.imageList li.mod2val1.mod5val4 {
+	transform: rotate3d(0.1, 0.1, 1, -3deg);
+}
+
+figure#image {
+	margin: 1em auto;
+	text-align: center;
+}
+
+figure#image a {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	max-width: 100%;
+	border-style: solid;
+	border-width: 1em;
+	border-image: url("../images/Lightbox/Large_contact.png") stretch 49 49 49 49;
+}
+
+figure#image img {
+	max-width: calc(100% - 2em);
+	height: auto;
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	border-style: solid;
+	border-width: 1em;
+	border-image: url("../images/Lightbox/Contact_corners.png") stretch 30 30 30 30;
+}
+
+figure#image figcaption p.imageDescription, figure figcaption a, figure figcaption a:visited {
+	margin: 0;
+	padding: 0.3em;
+	color: #ffba62;
+	font-size: large;
+}
+
+figure#image figcaption p.imageDescription {
+	border-bottom: 1px solid #ffba62;
+}
+
+figure#image table.exifData {
+	margin: 1em auto;
+	border: 3px solid #ffba62;
+	background-color: #752f30;
+	color: #ffba62;
+	padding: 0.2em 0.1em;
+	border-spacing: 0.5em 0.1em;
+	box-shadow: 0 0 4px;
+}
+
+@media screen {
+	/* Caption and table header are not really needed for screen display,
+	 as they're mostly intended to add context for speech browsers. */
+	figure#image table.exifData caption {
+		display: none;
+	}
+
+	figure#image table.exifData th[scope=col] {
+		display: none;
+	}
+}
+
+figure#image table.exifData th {
+	border: 1px solid #ffba62;
+	padding: 0.2em 0.3em;
+}
+
+figure#image table.exifData th[scope=row] {
+	text-align: right;
+}
+
+figure#image table.exifData td {
+	border: 1px solid #ffba62;
+	padding: 0.2em 0.3em;
+}
+
+figure#image figcaption p.originalImageLink {
+	margin: 0;
+	border-top: 1px solid #ffba62;
+	padding: 0.3em;
+}
+
+@media screen and (max-width: 600px) {
+	body {
+		border-image-source: none;
+		border-width: 0;
+	}
+	body > header {
+		border-image-source: none;
+		border-width: 0;
+		margin: 0;
+	}
+	ol.imageList li.mod2val0.mod5val0, ol.imageList li.mod2val1.mod5val1, ol.imageList li.mod2val0.mod5val2, ol.imageList li.mod2val1.mod5val3, ol.imageList li.mod2val0.mod5val4, ol.imageList li.mod2val1.mod5val0, ol.imageList li.mod2val0.mod5val1, ol.imageList li.mod2val1.mod5val2, ol.imageList li.mod2val0.mod5val3, ol.imageList li.mod2val1.mod5val4 {
+		transform: rotate(0);
+	}
+ul.collectionList li figure, ol.imageList li figure {
+		/*
+		 * Only Firefox currently supports the gap property for flex layout, so
+		 * when the window is narrow the figure margin width takes up too much
+		 * space at the left and right edges. So zero the margin when the width
+		 * is so narrow that we expect a column images. If the gap property is
+		 * supported in future then replace figure margins with gap.
+		 */
+		margin: 0;
+	}
+}

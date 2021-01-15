@@ -1,0 +1,125 @@
+<!DOCTYPE kpartgui SYSTEM "kpartgui.dtd">
+<gui version="616" name="lighttablewindow" translationDomain="digikam" >
+
+<MenuBar>
+
+    <Menu name="File" ><text>&amp;File</text>
+        <Action name="lighttable_first" />
+        <Action name="lighttable_backward" />
+        <Action name="lighttable_forward" />
+        <Action name="lighttable_last" />
+        <Separator/>
+        <Action name="lighttable_setitemleft" />
+        <Action name="lighttable_setitemright" />
+        <Action name="lighttable_edititem" />
+        <Separator/>
+        <Action name="open_with_default_application" />
+        <Separator/>
+        <Action name="lighttable_removeitem" />
+        <Action name="lighttable_clearlist" />
+        <Separator/>
+        <Action name="lighttable_filedelete" />
+        <Separator/>
+        <Action name="lighttable_close" />
+    </Menu>
+
+    <Menu name="View" ><text>&amp;View</text>
+        <Action name="lighttable_fullscreen" />
+
+        <!-- _DPLUGINS_GENERIC_VIEW_ACTIONS_ -->
+
+        <Separator/>
+        <Action name="lighttable_syncpreview" />
+        <Action name="lighttable_navigatebypair" />
+        <Separator/>
+        <Menu name="LeftPanel"><text>&amp;Left Panel</text>
+            <Action name="lighttable_zoomplus_left" />
+            <Action name="lighttable_zoomminus_left" />
+            <Action name="lighttable_zoomto100percents_left" />
+            <Action name="lighttable_zoomfit2window_left" />
+        </Menu>
+        <Menu name="RightPanel"><text>&amp;Right Panel</text>
+            <Action name="lighttable_zoomplus_right" />
+            <Action name="lighttable_zoomminus_right" />
+            <Action name="lighttable_zoomto100percents_right" />
+            <Action name="lighttable_zoomfit2window_right" />
+        </Menu>
+        <Separator />
+        <Action name="color_managed_view" />
+    </Menu>
+
+    <Menu name="Tools"><text>&amp;Tools</text>
+
+        <!-- _DPLUGINS_GENERIC_METADATA_ACTIONS_ -->
+
+        <Separator/>
+
+        <!-- _DPLUGINS_GENERIC_TOOL_ACTIONS_ -->
+
+    </Menu>
+
+    <Menu name="Import"><text>I&amp;mport</text>
+
+        <!-- _DPLUGINS_GENERIC_IMPORT_ACTIONS_ -->
+
+    </Menu>
+
+    <Menu name="Export"><text>&amp;Export</text>
+
+        <!-- _DPLUGINS_GENERIC_EXPORT_ACTIONS_ -->
+
+    </Menu>
+
+    <Menu name="settings" noMerge="1"><Text>&amp;Settings</Text>
+        <Merge name="StandardToolBarMenuHandler" />
+        <Action name="options_show_menubar" />
+        <Action name="options_show_statusbar" />
+        <Action name="options_show_toolbar" />
+        <Action name="lighttable_showthumbbar" />
+        <Separator/>
+        <Action name="theme_menu" />
+        <Action name="options_configure_keybinding" />
+        <Action name="options_configure_toolbars" />
+        <Action name="options_configure_notifications" />
+        <Action name="options_configure" />
+    </Menu>
+
+    <Menu name="help" ><text>&amp;Help</text>
+        <Action name="help_rawcameralist" />
+        <Action name="help_librariesinfo" />
+        <Action name="help_dbstat" />
+        <Separator/>
+        <Action name="help_donatemoney" />
+        <Action name="help_contribute" />
+        <Action name="help_handbook" />
+    </Menu>
+
+    <Merge/>
+
+</MenuBar>
+
+<ToolBar name="mainToolBar" ><text>Main Toolbar</text>
+     <Action name="lighttable_first" />
+     <Action name="lighttable_backward" />
+     <Action name="lighttable_forward" />
+     <Action name="lighttable_last" />
+     <Separator/>
+     <Action name="lighttable_zoomplus" />
+     <Action name="lighttable_zoomminus" />
+     <Action name="lighttable_zoomfit2window" />
+     <Separator/>
+     <Action name="lighttable_setitemleft" />
+     <Action name="lighttable_setitemright" />
+     <Action name="lighttable_syncpreview" />
+     <Action name="lighttable_navigatebypair" />
+     <Separator/>
+     <Action name="slideshow_plugin" />
+     <Action name="lighttable_fullscreen" />
+     <Merge />
+     <WeakSeparator/>
+     <Action name="logo_action" />
+ </ToolBar>
+
+<ActionProperties/>
+
+</gui>

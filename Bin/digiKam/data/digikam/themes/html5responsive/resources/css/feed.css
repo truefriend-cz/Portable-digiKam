@@ -1,0 +1,182 @@
+@import url("fundament.css");
+
+html {
+	background-color: black;
+	text-align: center;
+}
+
+body {
+	display: inline-block;
+	margin: 0 auto;
+	border: 1px solid white;
+	background-color: black;
+	color: white;
+	font-family: "Open Sans", Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+h1, h2, h3, h4 {
+	font-family: "Droid Serif", "Liberation Serif", "DejaVu Serif", "Alegreya", "Georgia", "Times New Roman", serif;
+}
+
+a {
+	color: white;
+}
+
+a:visited {
+	color: #ccc;
+}
+
+h1, header, footer {
+	max-width: 30em;
+	margin: 0 auto;
+}
+
+ul.collectionList {
+	max-width: calc(100% - 2px);
+}
+
+.collectionList figure {
+	margin: 0;
+}
+
+.collectionList li + li {
+	margin-top: 2em;
+}
+
+ol.imageList {
+	max-width: calc(100% - 2px);
+}
+
+ol.imageList li + li {
+	border-top: 0.25em solid #888;
+}
+
+.imageList figure {
+	background-color: black;
+	margin: 2em 0;
+}
+
+.imageList figure a {
+	display: inline-block;
+	margin: 0;
+}
+
+li figure img {
+	display: inline-block;
+	margin: 0;
+	border: 1px solid white;
+	max-width: calc(100% - 4px);
+	height: auto;
+}
+
+.imageList figcaption {
+	margin-top: 0.5em;
+	min-height: 1.5em;
+	border: 1px solid black;
+	border-radius: 1em;
+	padding: 0.5em;
+	background-color: white;
+	color: black;
+	font-size: small;
+	text-align: center;
+}
+
+.imageList figcaption .imageTitle {
+	display: none;
+}
+
+.imageList figcaption .imageDate {
+	float: right;
+	margin: 0 0 1em 1em;
+	border-radius: 0.5em;
+	padding: 0.1em 0.3em;
+	background-color: black;
+	color: white;
+}
+
+.imageList figcaption .imageDescription {
+	max-width: 30em;
+	margin: 0;
+	text-align: left;
+}
+
+nav p.upLink {
+	margin: 0.3em 0;
+}
+
+div.pagination, div.pagination ol {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: baseline;
+	align-content: space-around;	
+}
+
+div.pagination p, div.pagination ol, div.pagination ol li {
+	margin: 0.3em 0;
+}
+
+div.pagination p + p, div.pagination p + ol, div.pagination ol + p {
+	margin-left: 1em;
+}
+
+div.pagination ol li + li {
+	margin-left: 1em;
+}
+
+body.imagePage figure#image img {
+	max-width: calc(100% - 2px);
+	height: auto;
+}
+
+body.imagePage figcaption {
+	text-align: center;
+}
+
+body.imagePage p.imageDescription {
+	max-width: 40em;
+	margin: 0.5em auto;
+}
+
+table.exifData {
+	margin: 1em auto;
+	border: 1px solid #aaa;
+	border-radius: 1em;
+	padding: 0.2em;
+	border-spacing: 0.75em 0.4em;
+}
+
+table.exifData caption {
+	border-radius: 1em;
+	background-color: white;
+	color: black;
+	padding: 0.2em;
+}
+
+table.exifData th[scope="row"] {
+	text-align: right;
+}
+
+table.exifData td {
+	text-align: left;
+}
+
+body.imagePage footer {
+	margin-top: 2em;
+}
+
+div.copyright {
+	padding: 0.3em;
+}
+
+th, td {
+	vertical-align: top;
+}
+
+@media screen {
+	/* Header row is not really needed for screen display,
+	 as it's mostly intended to add context for speech browsers. */
+	figure#image table.exifData th[scope=col] {
+		display: none;
+	}
+}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="100%"
+   height="100%"
+   viewBox="0 0 14 14"
+   id="svg2">
+  <defs
+     id="defs8" />
+  <metadata
+     id="metadata8">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <rect
+     width="14"
+     height="14"
+     x="0"
+     y="0"
+     id="canvas"
+     style="visibility:hidden;fill:none;stroke:none" />
+  <path
+     id="path3337-3"
+     style="fill:#ac39ac;fill-opacity:1;fill-rule:evenodd;stroke:#ffffff;stroke-opacity:1;stroke-width:0.6;stroke-miterlimit:4;stroke-dasharray:none;stroke-linejoin:round;stroke-linecap:round"
+     d="M 8.396,9.341 A 1.385,1.385 0 0 1 7.010,10.72 1.385,1.385 0 0 1 5.625,9.341 1.385,1.385 0 0 1 7.010,7.956 1.385,1.385 0 0 1 8.396,9.341 Z m -6.015172,-8.8077074 0,12.932204 9.2372881,0 0,-12.932204 -9.2372881,0 z m 4.683,0.894 c 1.0203227,0 1.847,0.827 1.847,1.847 0,1.0203227 -0.8271349,1.8474576 -1.8474576,1.8474576 -1.0203227,0 -1.8474576,-0.8271349 -1.8474576,-1.8474576 0,-1.0203227 0.8271349,-1.8474576 1.8474576,-1.8474576 z M 7.009,6.065 A 3.233,3.233 0 0 1 10.24,9.298 3.233,3.233 0 0 1 7.009,12.53 3.233,3.233 0 0 1 3.775,9.298 3.233,3.233 0 0 1 7.009,6.065 Z" />
+  <path
+     id="path3337"
+     style="fill:#ac39ac;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-opacity:1"
+     d="M 8.396,9.341 A 1.385,1.385 0 0 1 7.010,10.72 1.385,1.385 0 0 1 5.625,9.341 1.385,1.385 0 0 1 7.010,7.956 1.385,1.385 0 0 1 8.396,9.341 Z m -6.015172,-8.80770739 0,12.93220369 9.2372881,0 0,-12.93220369 -9.2372881,0 z M 7.064,1.428 c 1.0203227,0 1.847,0.827 1.847,1.847 0,1.0203227 -0.8271349,1.8474576 -1.8474576,1.8474576 -1.0203227,0 -1.8474576,-0.8271349 -1.8474576,-1.8474576 0,-1.0203227 0.8271349,-1.8474576 1.8474576,-1.8474576 z M 7.009,6.065 A 3.233,3.233 0 0 1 10.24,9.298 3.233,3.233 0 0 1 7.009,12.53 3.233,3.233 0 0 1 3.775,9.298 3.233,3.233 0 0 1 7.009,6.065 Z" />
+</svg>
