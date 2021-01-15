@@ -1,6 +1,7 @@
 # Portable version of digiKam
 
 digiKam version: 7.1.0
+
 https://www.digikam.org/about/overview/
 
 # What is digiKam?
